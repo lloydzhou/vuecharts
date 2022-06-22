@@ -268,7 +268,7 @@ export const Chart = defineComponent({
       removeOption: (key, id) => {
         state.replaceMerge.add(key)
         if (state.options[key]) {
-          state.options[key] = state.options[key].filter(id => id !== id)
+          state.options[key] = state.options[key].filter(i => i.id !== id)
           setOption()
         }
       }
