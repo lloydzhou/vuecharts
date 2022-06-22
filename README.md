@@ -72,4 +72,42 @@ export default defineComponent({
 ![image](https://user-images.githubusercontent.com/1826685/174950158-e5f8258d-b0b9-4c39-be90-7eefbb7667f0.png)
 
 
+## 自定义组件
+
+1. 通过自定义组件实现官方切换图像的demo
+
+```
+import { contextSymbol } from 'vuecharts3'
+
+const TreemapSunburstTransition = defineComponent({
+  inject: [contextSymbol],
+  setup() {
+    const { chart } = inject(contextSymbol)
+const url = "https://fastly.jsdelivr.net/gh/apache/echarts-website@asf-site/examples/data/asset/data/echarts-package-size.json"
+    fetch(url).then(res => res.json()).then(data => {
+      const treemapOption = {...}
+      const sunburstOption = {...}
+
+      // 这里循环切换图形展示
+      let currentOption = treemapOption;
+      chart.setOption(currentOption);
+      setInterval(function () {
+        currentOption =
+          currentOption === treemapOption ? sunburstOption : treemapOption;
+        chart.setOption(currentOption);
+      }, 3000);
+    })
+    return () => null
+  }
+})
+
+// template
+<Chart>
+  <TreemapSunburstTransition />
+</Chart>
+
+```
+
+![](https://fastly.jsdelivr.net/gh/apache/echarts-website@asf-site/examples/data/thumb/treemap-sunburst-transition.webp?_v_=1655181358610)
+
 

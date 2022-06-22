@@ -21,21 +21,82 @@
       <VisualMap :calculable="true" orient='horizontal' left='center' bottom="15%" :min="0" max="10" />
       <Heatmap name="Punch Card" :data="data" :label="{show: true}" :emphasis="{itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.5)'}}" />
     </Chart>
+    <h2>切换图形</h2>
+    <Chart>
+      <TreemapSunburstTransition />
+    </Chart>
   </div>
 </template>
 
 <script lang="ts">
 // @ts-nocheck
-import { defineComponent } from 'vue'
+import { defineComponent, inject } from 'vue'
 // 这里是引用全部的echarts，可以自己参照文档做按需加载
 import 'echarts'
-import Echarts from '../src/index'
+import Echarts, { contextSymbol } from '../src/index'
 // import Echarts from 'vuecharts3'
 
 console.log('Echarts', Echarts)
 
 const { Chart, Title, Tooltip, Line, Bar, Legend, Grid, XAxis, YAxis, Heatmap, VisualMap } = Echarts
 
+const TreemapSunburstTransition = defineComponent({
+  inject: [contextSymbol],
+  setup() {
+    const { chart } = inject(contextSymbol)
+
+    const url = "https://fastly.jsdelivr.net/gh/apache/echarts-website@asf-site/examples/data/asset/data/echarts-package-size.json"
+    fetch(url).then(res => res.json()).then(data => {
+      const treemapOption = {
+        series: [
+          {
+            type: 'treemap',
+            id: 'echarts-package-size',
+            animationDurationUpdate: 1000,
+            roam: false,
+            nodeClick: undefined,
+            data: data.children,
+            universalTransition: true,
+            label: {
+              show: true
+            },
+            breadcrumb: {
+              show: false
+            }
+          }
+        ]
+      };
+      const sunburstOption = {
+        series: [
+          {
+            type: 'sunburst',
+            id: 'echarts-package-size',
+            radius: ['20%', '90%'],
+            animationDurationUpdate: 1000,
+            nodeClick: undefined,
+            data: data.children,
+            universalTransition: true,
+            itemStyle: {
+              borderWidth: 1,
+              borderColor: 'rgba(255,255,255,.5)'
+            },
+            label: {
+              show: false
+            }
+          }
+        ]
+      };
+      let currentOption = treemapOption;
+      chart.setOption(currentOption);
+      setInterval(function () {
+        currentOption =
+          currentOption === treemapOption ? sunburstOption : treemapOption;
+        chart.setOption(currentOption);
+      }, 3000);
+    })
+    return () => null
+  }
+})
 
 export default defineComponent({
 
@@ -43,6 +104,7 @@ export default defineComponent({
     Chart,
     Title, Tooltip, Bar, Line, Legend, Grid, XAxis, YAxis,
     Heatmap, VisualMap,
+    TreemapSunburstTransition,
   },
 
   setup() {

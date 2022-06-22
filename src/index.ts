@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { Chart, default as Echarts } from './Chart'
+import { Chart, contextSymbol, useComponent, default as Echarts } from './Chart'
 
 const components = [
   ...Object.values(Echarts), // 这里将Echarts这个里面所有的组件都注册一下
@@ -18,6 +18,8 @@ if (typeof window !== 'undefined' && window.Vue) {
 
 Echarts.install = install
 Chart.install = install
+
+export { Chart, contextSymbol, useComponent }
 
 export default Echarts
 

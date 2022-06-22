@@ -34,7 +34,7 @@ export const useComponent = (props, name, type) => {
       : dataZoom.indexOf() > -1
         ? 'dataZoom'
         : name.charAt(0).toLowerCase() + name.slice(1)
-  const { chart, initOption } = inject(contextSymbol)
+  const { chart, setOption } = inject(contextSymbol)
   const id = props.id || uniqueId()
   onMounted(() => {
     const options = markRaw({
@@ -43,7 +43,7 @@ export const useComponent = (props, name, type) => {
       id,
     })
     // console.log('chart', chart, key, options)
-    initOption(key, options)
+    setOption(key, options)
   })
   onUnmounted(() => {
     const o = chart.getOption()[key] || []
@@ -251,7 +251,7 @@ export const Chart = defineComponent({
     const state = shallowReactive({
       options: props.option,
       chart: {},
-      initOption: (key, option) => {
+      setOption: (key, option) => {
         if (!state.options[key]) {
           state.options[key] = []
         }
@@ -328,10 +328,8 @@ Object.keys(componentsMap).forEach(name => {
     props: componentsMap[name],
     inject: [contextSymbol],
     setup (props) {
-      return useComponent(props, name, type)
-    },
-    render() {
-      return null
+      useComponent(props, name, type)
+      return () => null
     }
   })
 })
