@@ -32,6 +32,8 @@ import 'echarts'
 import Echarts from '../src/index'
 // import Echarts from 'vuecharts3'
 
+console.log('Echarts', Echarts)
+
 const { Chart, Title, Tooltip, Line, Bar, Legend, Grid, XAxis, YAxis, Heatmap, VisualMap } = Echarts
 
 

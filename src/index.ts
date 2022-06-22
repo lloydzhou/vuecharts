@@ -17,6 +17,7 @@ if (typeof window !== 'undefined' && window.Vue) {
 }
 
 Echarts.install = install
+Chart.install = install
 
 export default Echarts
 
