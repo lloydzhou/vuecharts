@@ -248,7 +248,7 @@ export const Chart = defineComponent({
     const timer = ref()
     const state = shallowReactive({
       options: props.option,
-      replaceMerge: new Set(),
+      replaceMerge: [],
       chart: {},
       setOption: (key, option) => {
         Object.keys(option).forEach(name => {
@@ -261,12 +261,16 @@ export const Chart = defineComponent({
           state.options[key] = []
         }
         state.options[key].push(option)
-        state.replaceMerge.add(key)
+        if (state.replaceMerge.indexOf(key) === -1) {
+          state.replaceMerge.push(key)
+        }
         // 子组件里面的props第一次初始化的时候，不调用setOption，而是等子组件都加载好了再一次性的初始化
         setOption()
       },
       removeOption: (key, id) => {
-        state.replaceMerge.add(key)
+        if (state.replaceMerge.indexOf(key) === -1) {
+          state.replaceMerge.push(key)
+        }
         if (state.options[key]) {
           state.options[key] = state.options[key].filter(i => i.id !== id)
           setOption()
@@ -282,7 +286,7 @@ export const Chart = defineComponent({
         // console.log('setOption', state.chart, option, state.options)
         if (state.chart) {
           state.chart.setOption(option, {lazyUpdate: props.lazyUpdate, replaceMerge: [...state.replaceMerge]})
-          state.replaceMerge = new Set()
+          state.replaceMerge = []
         }
       }, 50)
     }
