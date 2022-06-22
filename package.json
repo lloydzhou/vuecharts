@@ -1,5 +1,5 @@
 {
-  "name": "vuecharts",
+  "name": "vuecharts3",
   "version": "1.0.0",
   "description": "the vue toolkit based on echarts",
   "scripts": {
@@ -12,6 +12,11 @@
     "type": "git",
     "url": "https://github.com/lloydzhou/vuecharts.git"
   },
+  "keywords": [
+    "vue",
+    "vue3",
+    "echarts"
+  ],
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "peerDependencies": {
