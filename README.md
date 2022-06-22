@@ -5,6 +5,11 @@
 2. 参考[BizCharts](https://github.com/alibaba/BizCharts)对[G2](https://github.com/antvis/G2)这个库的封装方式，对echarts进行了封装。相对而言API更方便使用
 
 
+## 安装
+```
+yarn add vuecharts
+```
+
 ## DEMO
 ```
 import 'echarts'
@@ -58,11 +63,6 @@ export default defineComponent({
 
 ![image](https://user-images.githubusercontent.com/1826685/174950158-e5f8258d-b0b9-4c39-be90-7eefbb7667f0.png)
 
-
-## 安装
-```
-yarn add vuecharts
-```
 
 
 
