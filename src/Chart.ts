@@ -36,8 +36,6 @@ export const useComponent = (props, name, type) => {
         : name.charAt(0).toLowerCase() + name.slice(1)
   const { chart, initOption } = inject(contextSymbol)
   const id = props.id || uniqueId()
-  // type为空，使用name首字母小写
-  type = type || name.charAt(0).toLowerCase() + name.slice(1)
   onMounted(() => {
     const options = markRaw({
       ...props,
@@ -66,7 +64,7 @@ const insideProps = [
   'type', 'id', 'disabled', 'xAxisIndex', 'yAxisIndex', 'radiusAxisIndex', 'angleAxisIndex', 'filterMode', 'start', 'end', 'startValue', 'endValue', 'minSpan', 'maxSpan', 'minValueSpan', 'maxValueSpan', 'orient', 'zoomLock', 'throttle', 'rangeMode', 'zoomOnMouseWheel', 'moveOnMouseMove', 'moveOnMouseWheel', 'preventDefaultMouseMove'
 ]
 
-const props = {
+const componentsMap = {
   Title: [
     'id', 'show', 'text', 'link', 'target', 'textStyle', 'subtext', 'sublink', 'subtarget', 'subtextStyle', 'textAlign', 'textVerticalAlign', 'triggerEvent', 'padding', 'itemGap', 'zlevel', 'z', 'left', 'top', 'right', 'bottom', 'backgroundColor', 'borderColor', 'borderWidth', 'borderRadius', 'shadowBlur', 'shadowColor', 'shadowOffsetX', 'shadowOffsetY'
   ],
@@ -322,13 +320,15 @@ export const Chart = defineComponent({
 })
 
 const components = { Chart }
-Object.keys(props).forEach(name => {
+Object.keys(componentsMap).forEach(name => {
+  // type为空，使用name首字母小写
+  const type = defaultTypeMap[name] || (name.charAt(0).toLowerCase() + name.slice(1))
   components[name] = defineComponent({
     name,
-    props: props[name],
+    props: componentsMap[name],
     inject: [contextSymbol],
     setup (props) {
-      return useComponent(props, name, defaultTypeMap[name])
+      return useComponent(props, name, type)
     },
     render() {
       return null
