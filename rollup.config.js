@@ -17,11 +17,11 @@ export default {
     name: 'vuecharts',
     format: 'umd',
     file: "dist/index.js",
-    banner: '// @ts-nocheck\nimport {h} from "vue"\n',
+    banner: '// @ts-nocheck',
   }, {
     format: 'es',
     file: "dist/index.es.js",
-    banner: '// @ts-nocheck\nimport {h} from "vue"\n',
+    banner: '// @ts-nocheck',
   }],
   plugins: [
     less({

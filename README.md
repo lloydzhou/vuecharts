@@ -7,13 +7,13 @@
 
 ## 安装
 ```
-yarn add vuecharts
+yarn add vuecharts3
 ```
 
 ## DEMO
 ```
 import 'echarts'
-import Echarts from 'vuecharts'
+import Echarts from 'vuecharts3'
 
 const { Chart, Title, Tooltip, Line, Bar, Legend, Grid, XAxis, YAxis } = Echarts
 

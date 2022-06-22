@@ -27,8 +27,10 @@
 <script lang="ts">
 // @ts-nocheck
 import { defineComponent } from 'vue'
+// 这里是引用全部的echarts，可以自己参照文档做按需加载
 import 'echarts'
-import Echarts from '../src/Chart'
+import Echarts from '../src/index'
+// import Echarts from 'vuecharts3'
 
 const { Chart, Title, Tooltip, Line, Bar, Legend, Grid, XAxis, YAxis, Heatmap, VisualMap } = Echarts
 

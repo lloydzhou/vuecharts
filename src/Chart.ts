@@ -11,26 +11,8 @@ import {
   onUnmounted,
 } from 'vue'
 
-// 按需加载
+// 按需加载  https://echarts.apache.org/handbook/zh/basics/import#%E6%8C%89%E9%9C%80%E5%BC%95%E5%85%A5-echarts-%E5%9B%BE%E8%A1%A8%E5%92%8C%E7%BB%84%E4%BB%B6
 import * as echarts from 'echarts/core'
-import {
-  TitleComponent,
-  TooltipComponent,
-  GridComponent,
-  DatasetComponent,
-  TransformComponent
-} from 'echarts/components';
-import { CanvasRenderer } from 'echarts/renderers';
-
-// 注册一些必须的组件
-echarts.use([
-  TitleComponent,
-  TooltipComponent,
-  GridComponent,
-  DatasetComponent,
-  TransformComponent,
-  CanvasRenderer,
-])
 
 export const uniqueId = () => Date.now().toString(36) + Math.random().toString(36).substring(2);
 
