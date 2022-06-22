@@ -30,7 +30,7 @@
 
 <script lang="ts">
 // @ts-nocheck
-import { defineComponent, inject } from 'vue'
+import { defineComponent, inject, ref, onUnmounted } from 'vue'
 // 这里是引用全部的echarts，可以自己参照文档做按需加载
 import 'echarts'
 import Echarts, { contextSymbol } from '../src/index'
@@ -44,6 +44,7 @@ const TreemapSunburstTransition = defineComponent({
   inject: [contextSymbol],
   setup() {
     const { chart } = inject(contextSymbol)
+    const interval = ref()
 
     const url = "https://fastly.jsdelivr.net/gh/apache/echarts-website@asf-site/examples/data/asset/data/echarts-package-size.json"
     fetch(url).then(res => res.json()).then(data => {
@@ -88,12 +89,13 @@ const TreemapSunburstTransition = defineComponent({
       };
       let currentOption = treemapOption;
       chart.setOption(currentOption);
-      setInterval(function () {
+      interval.value = setInterval(function () {
         currentOption =
           currentOption === treemapOption ? sunburstOption : treemapOption;
         chart.setOption(currentOption);
       }, 3000);
     })
+    onUnmounted(() => clearInterval(interval.value))
     return () => null
   }
 })
