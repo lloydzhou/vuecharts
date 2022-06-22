@@ -34,7 +34,7 @@ export const useComponent = (props, name, type) => {
       : dataZoom.indexOf() > -1
         ? 'dataZoom'
         : name.charAt(0).toLowerCase() + name.slice(1)
-  const { chart, setOption } = inject(contextSymbol)
+  const { removeOption, setOption } = inject(contextSymbol)
   const id = props.id || uniqueId()
   onMounted(() => {
     const options = markRaw({
@@ -46,9 +46,7 @@ export const useComponent = (props, name, type) => {
     setOption(key, options)
   })
   onUnmounted(() => {
-    const o = chart.getOption()[key] || []
-    const option = o.filter(i => i && i.id !== id)
-    setOption(key, option)
+    removeOption(key, id)
   })
 }
 
@@ -250,6 +248,7 @@ export const Chart = defineComponent({
     const timer = ref()
     const state = shallowReactive({
       options: props.option,
+      replaceMerge: new Set(),
       chart: {},
       setOption: (key, option) => {
         Object.keys(option).forEach(name => {
@@ -258,16 +257,20 @@ export const Chart = defineComponent({
           }
         })
         // 如果传过来的本身是数组，那就直接覆盖
-        if (option.push) {
-          state.options = option
-        } else {
-          if (!state.options[key]) {
-            state.options[key] = []
-          }
-          state.options[key].push(option)
+        if (!state.options[key]) {
+          state.options[key] = []
         }
+        state.options[key].push(option)
+        state.replaceMerge.add(key)
         // 子组件里面的props第一次初始化的时候，不调用setOption，而是等子组件都加载好了再一次性的初始化
         setOption()
+      },
+      removeOption: (key, id) => {
+        state.replaceMerge.add(key)
+        if (state.options[key]) {
+          state.options[key] = state.options[key].filter(id => id !== id)
+          setOption()
+        }
       }
     })
     const setOption = (option) => {
@@ -276,9 +279,10 @@ export const Chart = defineComponent({
       }
       timer.value = setTimeout(() => {
         option = markRaw(option || state.options)
-        // console.log('setOption', state.chart, option, state.options)
+        console.log('setOption', state.chart, option, state.options)
         if (state.chart) {
-          state.chart.setOption(option, {lazyUpdate: props.lazyUpdate, notMerge: true})
+          state.chart.setOption(option, {lazyUpdate: props.lazyUpdate, replaceMerge: [...state.replaceMerge]})
+          state.replaceMerge = new Set()
         }
       }, 50)
     }
