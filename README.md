@@ -74,7 +74,7 @@ export default defineComponent({
 
 ## 自定义组件
 
-1. 通过自定义组件实现官方切换图像的demo
+1. 通过自定义组件实现官方切换图像的[example](https://echarts.apache.org/examples/zh/editor.html?c=treemap-sunburst-transition)
 
 ```
 import { contextSymbol } from 'vuecharts3'
