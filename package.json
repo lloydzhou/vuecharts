@@ -1,6 +1,6 @@
 {
   "name": "vuecharts3",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "the vue toolkit based on echarts",
   "scripts": {
     "prepare": "install-peers",
