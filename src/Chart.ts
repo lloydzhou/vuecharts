@@ -48,7 +48,7 @@ export const useComponent = (props, name, type) => {
   onUnmounted(() => {
     const o = chart.getOption()[key] || []
     const option = o.filter(i => i && i.id !== id)
-    chart.setOption({ [key]: option }, { replaceMerge: key })
+    setOption(key, option)
   })
 }
 
@@ -252,16 +252,21 @@ export const Chart = defineComponent({
       options: props.option,
       chart: {},
       setOption: (key, option) => {
-        if (!state.options[key]) {
-          state.options[key] = []
-        }
         Object.keys(option).forEach(name => {
           if (option[name] === undefined || option[name] === null) {
             delete option[name]
           }
         })
+        // 如果传过来的本身是数组，那就直接覆盖
+        if (option.push) {
+          state.options = option
+        } else {
+          if (!state.options[key]) {
+            state.options[key] = []
+          }
+          state.options[key].push(option)
+        }
         // 子组件里面的props第一次初始化的时候，不调用setOption，而是等子组件都加载好了再一次性的初始化
-        state.options[key].push(option)
         setOption()
       }
     })
@@ -272,7 +277,9 @@ export const Chart = defineComponent({
       timer.value = setTimeout(() => {
         option = markRaw(option || state.options)
         // console.log('setOption', state.chart, option, state.options)
-        state.chart.setOption(option, {lazyUpdate: props.lazyUpdate})
+        if (state.chart) {
+          state.chart.setOption(option, {lazyUpdate: props.lazyUpdate, notMerge: true})
+        }
       }, 50)
     }
     provide(contextSymbol, state)
