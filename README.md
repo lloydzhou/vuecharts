@@ -10,6 +10,14 @@
 yarn add vuecharts3
 ```
 
+## Components
+
+项目定义的组件包含在下图中，每一个都是一个vue的Component。
+具体的组件支持的配置信息参考：https://echarts.apache.org/zh/option.html#title（可以通过名字首字母小写后搜索到对应的配置项目）
+
+![image](https://user-images.githubusercontent.com/1826685/175003071-61970374-aceb-4579-ac63-cb042e267c77.png)
+
+
 ## DEMO
 ```
 import 'echarts'
@@ -62,7 +70,6 @@ export default defineComponent({
 ```
 
 ![image](https://user-images.githubusercontent.com/1826685/174950158-e5f8258d-b0b9-4c39-be90-7eefbb7667f0.png)
-
 
 
 
