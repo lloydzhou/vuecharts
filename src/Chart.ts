@@ -279,7 +279,7 @@ export const Chart = defineComponent({
       }
       timer.value = setTimeout(() => {
         option = markRaw(option || state.options)
-        console.log('setOption', state.chart, option, state.options)
+        // console.log('setOption', state.chart, option, state.options)
         if (state.chart) {
           state.chart.setOption(option, {lazyUpdate: props.lazyUpdate, replaceMerge: [...state.replaceMerge]})
           state.replaceMerge = new Set()
