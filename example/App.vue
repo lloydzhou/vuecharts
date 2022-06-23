@@ -13,14 +13,14 @@
       <Tooltip trigger="axis" />
     </Chart>
     <h2>Heatmap必须搭配VisualMap</h2>
-    <Chart>
-      <Tooltip position="top" />
-      <Grid top="10%" height="50%" />
-      <XAxis :data="hours" />
-      <YAxis :data="days" type="category" />
-      <VisualMap :calculable="true" orient='horizontal' left='center' bottom="15%" :min="0" max="10" />
-      <Heatmap name="Punch Card" :data="data" :label="{show: true}" :emphasis="{itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.5)'}}" />
-    </Chart>
+    <e-chart>
+      <e-tooltip position="top" />
+      <e-grid top="10%" height="50%" />
+      <e-x-axis :data="hours" />
+      <e-y-axis :data="days" type="category" />
+      <e-visual-map :calculable="true" orient='horizontal' left='center' bottom="15%" :min="0" max="10" />
+      <e-heatmap name="Punch Card" :data="data" :label="{show: true}" :emphasis="{itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.5)'}}" />
+    </e-chart>
     <h2>切换图形</h2>
     <Chart>
       <TreemapSunburstTransition />
@@ -105,7 +105,7 @@ export default defineComponent({
   components: {
     Chart,
     Title, Tooltip, Bar, Line, Legend, Grid, XAxis, YAxis,
-    Heatmap, VisualMap,
+    // Heatmap, VisualMap,
     TreemapSunburstTransition,
   },
 

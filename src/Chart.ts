@@ -9,6 +9,7 @@ import {
   inject,
   onMounted,
   onUnmounted,
+  Fragment,
 } from 'vue'
 
 // 按需加载  https://echarts.apache.org/handbook/zh/basics/import#%E6%8C%89%E9%9C%80%E5%BC%95%E5%85%A5-echarts-%E5%9B%BE%E8%A1%A8%E5%92%8C%E7%BB%84%E4%BB%B6
@@ -25,30 +26,6 @@ const series = [
 ]
 const visualMap = ['VisualMap', 'Continuous', 'Piecewise']
 const dataZoom = ['DataZoom', 'Inside', 'Slider']
-
-export const useComponent = (props, name, type) => {
-  const key = series.indexOf(name) > -1
-    ? 'series'
-    : visualMap.indexOf(name) > -1
-      ? 'visualMap'
-      : dataZoom.indexOf() > -1
-        ? 'dataZoom'
-        : name.charAt(0).toLowerCase() + name.slice(1)
-  const { removeOption, setOption } = inject(contextSymbol)
-  const id = props.id || uniqueId()
-  onMounted(() => {
-    const options = markRaw({
-      ...props,
-      type: props.type || type || undefined,
-      id,
-    })
-    // console.log('chart', chart, key, options)
-    setOption(key, options)
-  })
-  onUnmounted(() => {
-    removeOption(key, id)
-  })
-}
 
 const xAxisProps = [
   'id', 'show', 'gridIndex', 'alignTicks', 'position', 'offset', 'type', 'name', 'nameLocation', 'nameTextStyle', 'nameGap', 'nameRotate', 'inverse', 'boundaryGap', 'min', 'max', 'scale', 'splitNumber', 'minInterval', 'maxInterval', 'interval', 'logBase', 'silent', 'triggerEvent', 'axisLine', 'axisTick', 'minorTick', 'axisLabel', 'splitLine', 'minorSplitLine', 'splitArea', 'data', 'axisPointer', 'zlevel', 'z'
@@ -216,6 +193,7 @@ const defaultTypeMap = {
 
 export const Chart = defineComponent({
   name: 'Chart',
+  inheritAttrs: false,
   props: {
     option: {
       type: Object,
@@ -248,45 +226,52 @@ export const Chart = defineComponent({
     const timer = ref()
     const state = shallowReactive({
       options: props.option,
-      replaceMerge: [],
-      chart: {},
+      replaceMerge: new Set(),
+      chart: null,
       setOption: (key, option) => {
+        // 1. 移除option中无用的key
         Object.keys(option).forEach(name => {
           if (option[name] === undefined || option[name] === null) {
             delete option[name]
           }
         })
-        // 如果传过来的本身是数组，那就直接覆盖
+        // 2. 往当前的state.options中合并新的组件配置
         if (!state.options[key]) {
           state.options[key] = []
         }
         state.options[key].push(option)
-        if (state.replaceMerge.indexOf(key) === -1) {
-          state.replaceMerge.push(key)
-        }
-        // 子组件里面的props第一次初始化的时候，不调用setOption，而是等子组件都加载好了再一次性的初始化
-        setOption()
+        // 3. 增加replaceMerge
+        state.replaceMerge.add(key)
+        // 4. 提交更新到echarts
+        commit()
       },
       removeOption: (key, id) => {
-        if (state.replaceMerge.indexOf(key) === -1) {
-          state.replaceMerge.push(key)
-        }
         if (state.options[key]) {
+          // 1. 移除组件配置
           state.options[key] = state.options[key].filter(i => i.id !== id)
-          setOption()
+          // 2. 增加replaceMerge
+          state.replaceMerge.add(key)
+          // 3. 提交更新到echarts
+          commit()
         }
       }
     })
-    const setOption = (option) => {
+    // 这里实际上形成了一个批量更改一次提交的过程
+    // 避免了一个子组件有变化（例如series中的数据）
+    // 提交的时候影响到另一个子组件（例如xAxis）
+    const commit = () => {
       if (timer.value) {
         clearTimeout(timer.value)
       }
       timer.value = setTimeout(() => {
-        option = markRaw(option || state.options)
-        // console.log('setOption', state.chart, option, state.options)
         if (state.chart) {
-          state.chart.setOption(option, {lazyUpdate: props.lazyUpdate, replaceMerge: [...state.replaceMerge]})
-          state.replaceMerge = []
+          // 提交画布更新的时候，使用replaceMerge选项
+          state.chart.setOption(markRaw(state.options), {
+            lazyUpdate: props.lazyUpdate,
+            replaceMerge: Array.from(state.replaceMerge),
+          })
+          // 提交画布更新之后，重置replaceMerge
+          state.replaceMerge = new Set()
         }
       }, 50)
     }
@@ -297,8 +282,9 @@ export const Chart = defineComponent({
     })
 
     watch(() => props.option, option => {
-      setOption(markRaw(option))
-    })
+      // 需要将option全部放到state进行管理
+      Object.keys(option).forEach(key => state.setOption(option[key]))
+    }, { deep: true })
 
     watch(() => ({width: props.width, height: props.height}), size => {
       state.chart.resize(size)
@@ -315,7 +301,8 @@ export const Chart = defineComponent({
       chart.resize({ width: props.width, height: props.height })
       chart.on('rendered', rendered)
       chart.on('finished', finished)
-      setOption(state.options)
+      // 使用默认的option初始化画布
+      commit()
     }
     onMounted(() => init())
     onUnmounted(() => {
@@ -325,12 +312,12 @@ export const Chart = defineComponent({
       }
     })
 
-    return () => h('div', null, h('div', {
+    return () => h(Fragment, null, h('div', {
       ...attrs,
       class: attrs.class ? ['echarts'].concat(attrs.class) : 'echarts',
       ref: root,
-      style: 'display:block;width:100%;height:100%;min-height:1px;',
-    }), !!state.chart.getDom && slots.default && slots.default())
+      style: 'display:block;width:100%;height:100%;min-height:1px;' + (attrs.style || ''),
+    }), state.chart && slots.default && slots.default())
   },
 })
 
@@ -343,7 +330,26 @@ Object.keys(componentsMap).forEach(name => {
     props: componentsMap[name],
     inject: [contextSymbol],
     setup (props) {
-      useComponent(props, name, type)
+      const key = series.indexOf(name) > -1
+        ? 'series'
+        : visualMap.indexOf(name) > -1
+          ? 'visualMap'
+          : dataZoom.indexOf() > -1
+            ? 'dataZoom'
+            : name.charAt(0).toLowerCase() + name.slice(1)
+      const { removeOption, setOption } = inject(contextSymbol)
+      const id = props.id || uniqueId()
+      onMounted(() => {
+        const options = markRaw({
+          ...props,
+          type: props.type || type || undefined,
+          id,
+        })
+        // console.log('chart', chart, key, options)
+        setOption(key, options)
+      })
+      onUnmounted(() => removeOption(key, id))
+
       return () => null
     }
   })
