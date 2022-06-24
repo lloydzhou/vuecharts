@@ -1,5 +1,5 @@
 import vue from 'rollup-plugin-vue'
-import typescript from 'rollup-plugin-typescript2'
+// import typescript from 'rollup-plugin-typescript2'
 import babel from 'rollup-plugin-babel'
 import jsx from "acorn-jsx";
 import less from 'rollup-plugin-less';
@@ -9,6 +9,8 @@ import buble from 'rollup-plugin-buble'
 // import nodeResolve from 'rollup-plugin-node-resolve'
 // import optimizeLodashImports from "rollup-plugin-optimize-lodash-imports"
 // import commonjs from 'rollup-plugin-commonjs';
+import typescript from '@rollup/plugin-typescript';
+import ttypescript from 'ttypescript';
 
 
 export default {
@@ -48,10 +50,13 @@ export default {
     }),
     filesize(),
     typescript({
-      // tsconfig: false,
-      // experimentalDecorators: true,
-      // module: 'es2015'
+      typescript: ttypescript,
     }),
+    // typescript({
+    //   // tsconfig: false,
+    //   // experimentalDecorators: true,
+    //   // module: 'es2015'
+    // }),
     // commonjs({
     //   namedExports: {
     //     'node_modules/lodash/lodash.js': [
