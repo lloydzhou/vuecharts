@@ -4,7 +4,7 @@
   "description": "the vue toolkit based on echarts",
   "scripts": {
     "prepare": "install-peers",
-    "serve": "vue-cli-service serve example/main.ts",
+    "serve": "ttsc --outDir src/option src/option.ts -w & vue-cli-service serve example/main.ts",
     "build": "rollup -c",
     "lint": "vue-cli-service lint"
   },
@@ -23,6 +23,7 @@
     "echarts": "^5.3.3"
   },
   "devDependencies": {
+    "@rollup/plugin-typescript": "^8.3.3",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
     "@vue/babel-plugin-jsx": "^1.1.1",
@@ -38,6 +39,7 @@
     "babel-plugin-lodash": "^3.3.4",
     "babel-plugin-syntax-jsx": "^6.18.0",
     "babel-plugin-transform-vue-jsx": "^3.7.0",
+    "echarts": "^5.3.3",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^7.0.0",
     "install-peers-cli": "^2.2.0",
@@ -55,6 +57,8 @@
     "rollup-plugin-typescript": "^1.0.1",
     "rollup-plugin-typescript2": "^0.31.2",
     "rollup-plugin-vue": "^6.0.0",
+    "ts-transformer-keys": "^0.4.3",
+    "ttypescript": "^1.5.13",
     "typescript": "~4.1.5",
     "vue": "^3.2.31",
     "vue-class-component": "^8.0.0-rc.1"

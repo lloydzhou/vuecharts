@@ -15,6 +15,9 @@
     "types": [
       "webpack-env"
     ],
+    "plugins": [
+      { "transform": "ts-transformer-keys/transformer" }
+    ],
     "paths": {
       "@/*": [
         "src/*"
