@@ -24,24 +24,21 @@ import {
   SunburstSeriesOption,
   CustomSeriesOption,
   // 
-  VisualMapComponentOption,
   ContinousVisualMapOption,
   PiecewiseVisualMapOption,
   // 
-  DataZoomComponentOption,
   InsideDataZoomOption,
   SliderDataZoomOption,
   // 
   TitleOption,
-  LegendComponentOption,
   LegendOption,
   ScrollableLegendOption,
   GridOption,
   XAXisOption,
   YAXisOption,
-  PolarOption,
   RadiusAxisOption,
   AngleAxisOption,
+  PolarOption,
   RadarOption,
   TooltipOption,
   AxisPointerOption,
@@ -56,6 +53,30 @@ import {
   DatasetOption,
 } from 'echarts/types/dist/shared'
 
+import { ValueAxisBaseOption, LogAxisBaseOption, CategoryAxisBaseOption, TimeAxisBaseOption, AxisBaseOptionCommon } from 'echarts/types/src/coord/axisCommonTypes'
+
+
+type OptionalPropertyNames<T> =
+  { [K in keyof T]-?: ({} extends { [P in K]: T[K] } ? K : never) }[keyof T];
+
+type SpreadProperties<L, R, K extends keyof L & keyof R> =
+  { [P in K]: L[P] | Exclude<R[P], undefined> };
+
+type Id<T> = T extends infer U ? { [K in keyof U]: U[K] } : never
+
+type SpreadTwo<L, R> = Id<
+  & Pick<L, Exclude<keyof L, keyof R>>
+  & Pick<R, Exclude<keyof R, OptionalPropertyNames<R>>>
+  & Pick<R, Exclude<OptionalPropertyNames<R>, keyof L>>
+  & SpreadProperties<L, R, OptionalPropertyNames<R> & keyof L>
+>;
+
+type Spread<A extends readonly [...any]> = A extends [infer L, ...infer R] ?
+  SpreadTwo<L, Spread<R>> : unknown
+
+type AxisBaseOption = Spread<[ValueAxisBaseOption, LogAxisBaseOption, CategoryAxisBaseOption, TimeAxisBaseOption, AxisBaseOptionCommon]>
+
+
 export const series = [
   'Line', 'Bar', 'Pie', 'Scatter', 'EffectScatter', 'Radar', 'Tree', 'Treemap',
   'Sunburst', 'Boxplot', 'Candlestick', 'Heatmap', 'Map', 'Parallel', 'Lines',
@@ -67,21 +88,21 @@ export const dataZoom = ['DataZoom', 'Inside', 'Slider']
 
 export const componentsMap = {
   Title: keys<TitleOption>(),
-  Legend: keys<LegendOption>(),
+  Legend: keys<Spread<[LegendOption, ScrollableLegendOption]>>(),
   Grid: keys<GridOption>(),
-  XAxis: keys<XAXisOption>(),
-  YAxis: keys<YAXisOption>(),
+  XAxis: keys<Spread<[XAXisOption, AxisBaseOption]>>(),
+  YAxis: keys<Spread<[YAXisOption, AxisBaseOption]>>(),
   Polar: keys<PolarOption>(),
-  RadiusAxis: keys<RadiusAxisOption>(),
-  AngleAxis: keys<AngleAxisOption>(),
+  RadiusAxis: keys<Spread<[RadiusAxisOption, AxisBaseOption]>>(),
+  AngleAxis: keys<Spread<[AngleAxisOption, AxisBaseOption]>>(),
   // Radar和series.radar重合
   RadarAxis: keys<RadarOption>(),
-  DataZoom: keys<DataZoomComponentOption>(),
+  DataZoom: keys<Spread<[InsideDataZoomOption, SliderDataZoomOption]>>(),
   Inside: keys<InsideDataZoomOption>(),
   Slider: keys<SliderDataZoomOption>(),
 
   // visualMap
-  VisualMap: keys<VisualMapComponentOption>(),
+  VisualMap: keys<Spread<[ContinousVisualMapOption, PiecewiseVisualMapOption]>>(),
   Continuous: keys<ContinousVisualMapOption>(),
   Piecewise: keys<PiecewiseVisualMapOption>(),
 
@@ -92,7 +113,7 @@ export const componentsMap = {
   Geo: keys<GeoOption>(),
   // Parallel: [], // 这个和series.parallel重合了
   // ParallelAxis: keys<ParallelAxisOption>(),
-  SingleAxis: keys<SingleAxisOption>(),
+  SingleAxis: keys<Spread<[SingleAxisOption, AxisBaseOption]>>(),
   Timeline: keys<TimelineOption>(),
   // TODO Graphic: [],
   Calendar: keys<CalendarOption>(),
