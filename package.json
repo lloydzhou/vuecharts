@@ -5,7 +5,7 @@
   "scripts": {
     "prepare": "install-peers",
     "serve": "ttsc --outDir src/option src/option.ts -w & vue-cli-service serve example/main.ts",
-    "build": "rollup -c",
+    "build": "ttsc --outDir src/option src/option.ts && rollup -c",
     "lint": "vue-cli-service lint"
   },
   "repository": {
