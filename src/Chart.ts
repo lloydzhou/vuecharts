@@ -1,7 +1,7 @@
 // @ts-nocheck
 import {
   defineComponent,
-  ref, markRaw,
+  ref, markRaw, toRefs,
   shallowReactive,
   watch,
   h,
@@ -220,9 +220,9 @@ export const Chart = defineComponent({
       default : () => 300,
     },
   },
-  setup(props, { emit, attrs, slots }) {
+  setup(props, { emit }) {
 
-    const root = ref(null)
+    const container = ref(null)
     const timer = ref()
     const state = shallowReactive({
       options: props.option,
@@ -293,11 +293,10 @@ export const Chart = defineComponent({
     const rendered = () => emit('rendered')
     const finished = () => emit('finished')
     const init = () => {
-      const chart = state.chart = echarts.init(root.value)
+      const chart = state.chart = echarts.init(container.value)
       if (props.group) {
         chart.group = props.group
       }
-      // console.log('init chart', chart, state.options)
       chart.resize({ width: props.width, height: props.height })
       chart.on('rendered', rendered)
       chart.on('finished', finished)
@@ -312,16 +311,30 @@ export const Chart = defineComponent({
       }
     })
 
-    return () => h(Fragment, null, h('div', {
+    return {
+      ...toRefs(state), // 父组件如果绑定ref，可以拿到chart和内部重新定义的setOption方法
+      container,
+    }
+
+  },
+  render() {
+    const { $attrs: attrs, $slots: slots, chart } = this
+    return h(Fragment, null, h('div', {
       ...attrs,
       class: attrs.class ? ['echarts'].concat(attrs.class) : 'echarts',
-      ref: root,
+      ref: 'container',
       style: 'display:block;width:100%;height:100%;min-height:1px;' + (attrs.style || ''),
-    }), state.chart && slots.default && slots.default())
-  },
+    }), chart && slots.default && slots.default())
+  }
 })
 
 const components = { Chart }
+/**
+ * 这里是使用不同的配置生成了功能类似的组件
+ * 1. 组件通过id记录自己的配置信息，并且通过id让Chart集中管理整体的配置信息。
+ * 2. 监听props数据变化，更新当前组件配置
+ * 3. 卸载的时候移除当前组件配置
+ */
 Object.keys(componentsMap).forEach(name => {
   // type为空，使用name首字母小写
   const type = defaultTypeMap[name] || (name.charAt(0).toLowerCase() + name.slice(1))
@@ -338,16 +351,27 @@ Object.keys(componentsMap).forEach(name => {
             ? 'dataZoom'
             : name.charAt(0).toLowerCase() + name.slice(1)
       const { removeOption, setOption } = inject(contextSymbol)
-      const id = props.id || uniqueId()
-      onMounted(() => {
+      // 这里使用一个初始化的id
+      const id = ref(props.id || uniqueId())
+      // 如果id有变化的时候，先移除旧的，再生成新的
+      watch(() => props.id, (newId) => {
+        removeOption(key, id)
+        id.value = newId
+        update()
+      })
+      const update = () => {
         const options = markRaw({
           ...props,
           type: props.type || type || undefined,
-          id,
+          id: id.value,
         })
         // console.log('chart', chart, key, options)
         setOption(key, options)
-      })
+      }
+      // 监听props变化，更新配置信息
+      watch(() => props, update, { deep: true })
+      // 挂载组件的时候，初始化配置信息
+      onMounted(update)
       onUnmounted(() => removeOption(key, id))
 
       return () => null

@@ -22,7 +22,7 @@
       <e-heatmap name="Punch Card" :data="data" :label="{show: true}" :emphasis="{itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.5)'}}" />
     </e-chart>
     <h2>切换图形</h2>
-    <Chart>
+    <Chart ref="chart3">
       <TreemapSunburstTransition />
     </Chart>
   </div>
@@ -30,7 +30,7 @@
 
 <script lang="ts">
 // @ts-nocheck
-import { defineComponent, inject, ref, onUnmounted } from 'vue'
+import { defineComponent, inject, ref, onUnmounted, onMounted } from 'vue'
 // 这里是引用全部的echarts，可以自己参照文档做按需加载
 import 'echarts'
 import Echarts, { contextSymbol } from '../src/index'
@@ -126,10 +126,16 @@ export default defineComponent({
       return [item[1], item[0], item[2] || '-'];
     })
 
+    const chart3 = ref()
+    onMounted(() => {
+      console.log('chart3', chart3.value)
+    })
+
     return {
       hours,
       days,
       data,
+      chart3,
     }
   }
 })
