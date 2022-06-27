@@ -89,6 +89,8 @@ export const Chart = defineComponent({
         if (!state.options[key]) {
           state.options[key] = []
         }
+        // 尝试先移除一下相同的id，避免出现相同的id配置项
+        state.removeOption(key, option.id)
         state.options[key].push(option)
         // 3. 增加replaceMerge
         state.replaceMerge.add(key)
