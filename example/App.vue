@@ -30,7 +30,7 @@
 
 <script lang="ts">
 // @ts-nocheck
-import { defineComponent, inject, ref, onUnmounted, onMounted } from 'vue'
+import { defineComponent, inject, ref, onUnmounted, onMounted, h, reactive } from 'vue'
 // 这里是引用全部的echarts，可以自己参照文档做按需加载
 import 'echarts'
 import Echarts, { contextSymbol } from '../src/index'
@@ -39,64 +39,58 @@ import Echarts, { contextSymbol } from '../src/index'
 console.log('Echarts', Echarts)
 
 const { Chart, Title, Tooltip, Line, Bar, Legend, Grid, XAxis, YAxis, Heatmap, VisualMap } = Echarts
+const { Treemap, Sunburst } = Echarts
 
 const TreemapSunburstTransition = defineComponent({
+  name: 'TreemapSunburstTransition',
   inject: [contextSymbol],
   setup() {
     const { chart } = inject(contextSymbol)
     const interval = ref()
+    const state = reactive({
+      data: null,
+      type: '',
+    })
 
     const url = "https://fastly.jsdelivr.net/gh/apache/echarts-website@asf-site/examples/data/asset/data/echarts-package-size.json"
     fetch(url).then(res => res.json()).then(data => {
-      const treemapOption = {
-        series: [
-          {
-            type: 'treemap',
-            id: 'echarts-package-size',
-            animationDurationUpdate: 1000,
-            roam: false,
-            nodeClick: undefined,
-            data: data.children,
-            universalTransition: true,
-            label: {
-              show: true
-            },
-            breadcrumb: {
-              show: false
-            }
-          }
-        ]
-      };
-      const sunburstOption = {
-        series: [
-          {
-            type: 'sunburst',
-            id: 'echarts-package-size',
-            radius: ['20%', '90%'],
-            animationDurationUpdate: 1000,
-            nodeClick: undefined,
-            data: data.children,
-            universalTransition: true,
-            itemStyle: {
-              borderWidth: 1,
-              borderColor: 'rgba(255,255,255,.5)'
-            },
-            label: {
-              show: false
-            }
-          }
-        ]
-      };
-      let currentOption = treemapOption;
-      chart.setOption(currentOption);
+      state.data = data.children
+      console.log('data.value', data.children)
       interval.value = setInterval(function () {
-        currentOption =
-          currentOption === treemapOption ? sunburstOption : treemapOption;
-        chart.setOption(currentOption);
+        state.type = state.type == 'treemap' ? 'sunburst' : 'treemap'
+        console.log('state.type', state.type)
       }, 3000);
     })
     onUnmounted(() => clearInterval(interval.value))
-    return () => null
+    return () => state.type == 'treemap' ?
+      h(Treemap, {
+        id: 'echarts-package-size',
+        animationDurationUpdate: 1000,
+        roam: false,
+        nodeClick: undefined,
+        data: state.data,
+        universalTransition: true,
+        label: {
+          show: true
+        },
+        breadcrumb: {
+          show: false
+        }
+      }) : h(Sunburst, {
+        id: 'echarts-package-size',
+        radius: ['20%', '90%'],
+        animationDurationUpdate: 1000,
+        nodeClick: undefined,
+        data: state.data,
+        universalTransition: true,
+        itemStyle: {
+          borderWidth: 1,
+          borderColor: 'rgba(255,255,255,.5)'
+        },
+        label: {
+          show: false
+        }
+      })
   }
 })
 
