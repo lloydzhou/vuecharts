@@ -80,24 +80,55 @@ export default defineComponent({
 import { contextSymbol } from 'vuecharts3'
 
 const TreemapSunburstTransition = defineComponent({
+  name: 'TreemapSunburstTransition',
   inject: [contextSymbol],
   setup() {
     const { chart } = inject(contextSymbol)
-const url = "https://fastly.jsdelivr.net/gh/apache/echarts-website@asf-site/examples/data/asset/data/echarts-package-size.json"
-    fetch(url).then(res => res.json()).then(data => {
-      const treemapOption = {...}
-      const sunburstOption = {...}
+    const interval = ref()
+    const state = reactive({
+      data: null,
+      type: '',
+    })
 
-      // 这里循环切换图形展示
-      let currentOption = treemapOption;
-      chart.setOption(currentOption);
-      setInterval(function () {
-        currentOption =
-          currentOption === treemapOption ? sunburstOption : treemapOption;
-        chart.setOption(currentOption);
+    const url = "https://fastly.jsdelivr.net/gh/apache/echarts-website@asf-site/examples/data/asset/data/echarts-package-size.json"
+    fetch(url).then(res => res.json()).then(data => {
+      state.data = data.children
+      console.log('data.value', data.children)
+      interval.value = setInterval(function () {
+        state.type = state.type == 'treemap' ? 'sunburst' : 'treemap'
+        console.log('state.type', state.type)
       }, 3000);
     })
-    return () => null
+    onUnmounted(() => clearInterval(interval.value))
+    return () => state.type == 'treemap' ?
+      h(Treemap, {
+        id: 'echarts-package-size',
+        animationDurationUpdate: 1000,
+        roam: false,
+        nodeClick: undefined,
+        data: state.data,
+        universalTransition: true,
+        label: {
+          show: true
+        },
+        breadcrumb: {
+          show: false
+        }
+      }) : h(Sunburst, {
+        id: 'echarts-package-size',
+        radius: ['20%', '90%'],
+        animationDurationUpdate: 1000,
+        nodeClick: undefined,
+        data: state.data,
+        universalTransition: true,
+        itemStyle: {
+          borderWidth: 1,
+          borderColor: 'rgba(255,255,255,.5)'
+        },
+        label: {
+          show: false
+        }
+      })
   }
 })
 
