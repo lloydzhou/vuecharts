@@ -134,4 +134,9 @@ export default defineComponent({
   }
 })
 </script>
+<style lang="less">
+.echarts {
+  min-height: 300px;
+}
+</style>
 

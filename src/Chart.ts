@@ -3,7 +3,7 @@ import {
   defineComponent,
   ref, markRaw, toRefs,
   shallowReactive,
-  watch,
+  watch, watchEffect,
   h,
   provide,
   inject,
@@ -13,7 +13,8 @@ import {
 } from 'vue'
 
 // 按需加载  https://echarts.apache.org/handbook/zh/basics/import#%E6%8C%89%E9%9C%80%E5%BC%95%E5%85%A5-echarts-%E5%9B%BE%E8%A1%A8%E5%92%8C%E7%BB%84%E4%BB%B6
-import * as echarts from 'echarts/core'
+import { init as initChart, throttle } from 'echarts/core'
+import { addListener, removeListener } from "resize-detector";
 import {
   series,
   visualMap,
@@ -63,11 +64,15 @@ export const Chart = defineComponent({
     },
     width: {
       type: Number,
-      default : () => 800,
+      default : () => 0,
     },
     height: {
       type: Number,
-      default : () => 300,
+      default : () => 0,
+    },
+    autoresize: {
+      type: Boolean,
+      default : () => true,
     },
   },
   setup(props, { emit }) {
@@ -75,7 +80,7 @@ export const Chart = defineComponent({
     const container = ref(null)
     const timer = ref()
     const state = shallowReactive({
-      options: props.option,
+      options: markRaw(props.option),
       replaceMerge: new Set(),
       chart: null,
       setOption: (key, option) => {
@@ -138,23 +143,40 @@ export const Chart = defineComponent({
       Object.keys(option).forEach(key => state.setOption(option[key]))
     }, { deep: true })
 
-    watch(() => ({width: props.width, height: props.height}), size => {
-      state.chart.resize(size)
-    })
-
     const rendered = () => emit('rendered')
     const finished = () => emit('finished')
     const init = () => {
-      const chart = state.chart = echarts.init(container.value)
+      const chart = state.chart = initChart(container.value)
       if (props.group) {
         chart.group = props.group
       }
-      chart.resize({ width: props.width, height: props.height })
       chart.on('rendered', rendered)
       chart.on('finished', finished)
       // 使用默认的option初始化画布
       commit()
     }
+    // watch size
+    watchEffect(() => {
+      if (state.chart && props.width && props.height) {
+        state.chart.resize({ width: props.width, height: props.height })
+      }
+    })
+    // autoresize
+    watchEffect((cleanup) => {
+      console.log('autoresize', [container.value, state.chart, props.autoresize])
+      const resizeListener = throttle(() => {
+        console.log('resizeListener')
+        state.chart && state.chart.resize()
+      }, 100)
+      if (container.value && state.chart && props.autoresize) {
+        addListener(container.value, resizeListener)
+      }
+      cleanup(() => {
+        if (container.value && resizeListener) {
+          removeListener(container.value, resizeListener)
+        }
+      })
+    })
     onMounted(() => init())
     onUnmounted(() => {
       if (state.chart) {
@@ -175,7 +197,7 @@ export const Chart = defineComponent({
       ...attrs,
       class: attrs.class ? ['echarts'].concat(attrs.class) : 'echarts',
       ref: 'container',
-      style: 'display:block;width:100%;height:100%;min-height:1px;' + (attrs.style || ''),
+      style: 'display:block;width:100%;height:100%;' + (attrs.style || ''),
     }), chart && slots.default && slots.default())
   }
 })
