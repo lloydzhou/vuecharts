@@ -78,7 +78,6 @@ export const Chart = defineComponent({
   setup(props, { emit }) {
 
     const container = ref(null)
-    const timer = ref()
     const state = shallowReactive({
       options: markRaw(props.option),
       replaceMerge: new Set(),
@@ -116,22 +115,17 @@ export const Chart = defineComponent({
     // 这里实际上形成了一个批量更改一次提交的过程
     // 避免了一个子组件有变化（例如series中的数据）
     // 提交的时候影响到另一个子组件（例如xAxis）
-    const commit = () => {
-      if (timer.value) {
-        clearTimeout(timer.value)
+    const commit = throttle(() => {
+      if (state.chart) {
+        // 提交画布更新的时候，使用replaceMerge选项
+        state.chart.setOption(markRaw(state.options), {
+          lazyUpdate: props.lazyUpdate,
+          replaceMerge: Array.from(state.replaceMerge),
+        })
+        // 提交画布更新之后，重置replaceMerge
+        state.replaceMerge = new Set()
       }
-      timer.value = setTimeout(() => {
-        if (state.chart) {
-          // 提交画布更新的时候，使用replaceMerge选项
-          state.chart.setOption(markRaw(state.options), {
-            lazyUpdate: props.lazyUpdate,
-            replaceMerge: Array.from(state.replaceMerge),
-          })
-          // 提交画布更新之后，重置replaceMerge
-          state.replaceMerge = new Set()
-        }
-      }, 50)
-    }
+    }, 50, true)
     provide(contextSymbol, state)
 
     watch(() => props.group, group => {
@@ -163,9 +157,7 @@ export const Chart = defineComponent({
     })
     // autoresize
     watchEffect((cleanup) => {
-      console.log('autoresize', [container.value, state.chart, props.autoresize])
       const resizeListener = throttle(() => {
-        console.log('resizeListener')
         state.chart && state.chart.resize()
       }, 100)
       if (container.value && state.chart && props.autoresize) {
