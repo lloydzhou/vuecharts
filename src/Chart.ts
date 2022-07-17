@@ -74,6 +74,10 @@ export const Chart = defineComponent({
       type: Boolean,
       default : () => true,
     },
+    theme: {
+      type: [Object, String],
+      default : () => undefined,
+    },
   },
   setup(props, { emit }) {
 
@@ -140,7 +144,7 @@ export const Chart = defineComponent({
     const rendered = () => emit('rendered')
     const finished = () => emit('finished')
     const init = () => {
-      const chart = state.chart = initChart(container.value)
+      const chart = state.chart = initChart(container.value, props.theme)
       if (props.group) {
         chart.group = props.group
       }
@@ -168,6 +172,13 @@ export const Chart = defineComponent({
           removeListener(container.value, resizeListener)
         }
       })
+    })
+    // watch theme change
+    watch(() => props.theme, () => {
+      if (state.chart) {
+        state.chart.dispose()
+      }
+      init()
     })
     onMounted(() => init())
     onUnmounted(() => {
