@@ -33,7 +33,7 @@
 import { defineComponent, inject, ref, onUnmounted, onMounted, h, reactive } from 'vue'
 // 这里是引用全部的echarts，可以自己参照文档做按需加载
 import 'echarts'
-import Echarts, { contextSymbol } from '../src/index'
+import Echarts, { contextSymbol } from '../lib/index'
 // import Echarts from 'vuecharts3'
 
 console.log('Echarts', Echarts)

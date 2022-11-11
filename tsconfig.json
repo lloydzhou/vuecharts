@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
     "target": "esnext",
+    "outDir": "lib",
+    "sourceMap": true,
+    "declaration": true,
     "module": "esnext",
     "strict": true,
     "jsx": "preserve",
@@ -10,7 +13,6 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "sourceMap": true,
     "baseUrl": ".",
     "types": [
       "webpack-env"

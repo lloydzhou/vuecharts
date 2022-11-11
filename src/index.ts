@@ -1,11 +1,10 @@
 // @ts-nocheck
-import { Chart, contextSymbol, default as Echarts } from './Chart'
+import * as Echarts from './Components'
 
-const components = [
-  ...Object.values(Echarts), // 这里将Echarts这个里面所有的组件都注册一下
-]
+// 这里将Echarts这个里面所有的组件都注册一下
+const components = Object.values(Echarts).filter(i => !!i.setup)
 
-const install = function (Vue) {
+export const install = function (Vue) {
   components.forEach(component => {
     Vue.component(`E${component.name}`, component);
   });
@@ -17,9 +16,7 @@ if (typeof window !== 'undefined' && window.Vue) {
 }
 
 Echarts.install = install
-Chart.install = install
-
-export { Chart, contextSymbol }
 
 export default Echarts
+export * from './Chart'
 
