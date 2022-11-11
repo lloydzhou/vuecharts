@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <Chart>
+    <Chart ref="chart3">
       <Grid :top="100" />
       <Group
         bottom="110"
@@ -41,7 +41,7 @@
       <e-heatmap name="Punch Card" :data="data" :label="{show: true}" :emphasis="{itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.5)'}}" />
     </e-chart>
     <h2>切换图形</h2>
-    <Chart ref="chart3">
+    <Chart>
       <TreemapSunburstTransition />
     </Chart>
   </div>

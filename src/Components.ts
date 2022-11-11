@@ -152,7 +152,7 @@ export function Components<T>(name: string, props: string[], type: string = '', 
           state.options.push({ ...option, z: option.z || other.z })
         },
         removeOption: (key: string, id: string) => {
-          state.options = state.options.filter(i => i.id !== id.value)
+          state.options = state.options.filter((i: any) => i.id !== id.value)
         }
       })
       provide(contextSymbol, state)
@@ -168,11 +168,12 @@ export function Components<T>(name: string, props: string[], type: string = '', 
           type: ptype || type || undefined,
           id: id.value,
         })
-        if (key === "Graphic") {
+        if (key === "graphic") {
           if (type == "group") {
+            // @ts-ignore
             options["children"] = state.options
           }
-          // 
+          // @ts-ignore
           options["@action"] = action || "merge"
         }
         setOption(key, options)
@@ -220,7 +221,7 @@ export const SingleAxis = Components<SingleAxisOption>("SingleAxis", keys<Spread
 export const Timeline = Components<TimelineOption>("Timeline", keys<TimelineOption>());
 
 // TODO Graphic: 这里可以尝试把Graphic里面的暴露出来
-const GraphicComponent = (name: string) => Components<GraphicComponentLooseOption>(name, keys<AxisBaseOption>(), lower(name), "graphic");
+const GraphicComponent = (name: string) => Components<GraphicComponentLooseOption>(name, keys<AxisBaseOption>().concat(['right', 'children', 'bottom', 'bounding', 'rotation', 'shape', 'style']), lower(name), "graphic");
 
 export const Graphic = GraphicComponent("Graphic");
 export const Group = GraphicComponent("Group");
