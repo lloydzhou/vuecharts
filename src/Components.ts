@@ -67,6 +67,7 @@ import {
   onUnmounted,
   Fragment,
 } from 'vue'
+import { throttle } from "echarts/core";
 import { contextSymbol } from './Chart'
 
 import { ValueAxisBaseOption, LogAxisBaseOption, CategoryAxisBaseOption, TimeAxisBaseOption, AxisBaseOptionCommon } from 'echarts/types/src/coord/axisCommonTypes'
@@ -135,34 +136,54 @@ export function Components<T>(name: string, props: string[], type: string = '', 
     props: props as any,  // 使用ts-transformer-keys自动生成字段
     inject: [contextSymbol],
     // @ts-ignore
-    setup(props) {
+    setup(props, { slots }) {
       // @ts-ignore
       const { id: pid, type: ptype, children, action, ...other } = props;
       // @ts-ignore
       const { removeOption, setOption } = inject(contextSymbol)
       // 这里使用一个初始化的id
       const id = ref<string>((pid || uniqueId()) as string)
+      // Graphic
+      const state = shallowReactive({
+        options: markRaw([]),
+        setOption: (key: string, option: any) => {
+          state.removeOption(key, option.id)
+          // @ts-ignore
+          state.options.push({ ...option, z: option.z || other.z })
+        },
+        removeOption: (key: string, id: string) => {
+          state.options = state.options.filter(i => i.id !== id.value)
+        }
+      })
+      provide(contextSymbol, state)
       // 如果id有变化的时候，先移除旧的，再生成新的
       watch(() => props.id, (newId) => {
         removeOption(key, id)
         id.value = newId as string
         update()
       })
-      const update = () => {
+      const update = throttle(() => {
         const options = markRaw({
           ...other,
           type: ptype || type || undefined,
           id: id.value,
         })
+        if (key === "Graphic") {
+          if (type == "group") {
+            options["children"] = state.options
+          }
+          // 
+          options["@action"] = action || "merge"
+        }
         setOption(key, options)
-      }
+      }, 40, true)
       // 监听props变化，更新配置信息
       watch(() => props, update, { deep: true })
       // 挂载组件的时候，初始化配置信息
       onMounted(update)
       onUnmounted(() => removeOption(key, id))
 
-      return () => null
+      return () => key === "graphic" && type === "group" ? slots.default && slots.default() : null
     }
   }) 
 }
@@ -199,19 +220,19 @@ export const SingleAxis = Components<SingleAxisOption>("SingleAxis", keys<Spread
 export const Timeline = Components<TimelineOption>("Timeline", keys<TimelineOption>());
 
 // TODO Graphic: 这里可以尝试把Graphic里面的暴露出来
-const GraphicComponent = (name: string) => Components<GraphicComponentLooseOption>(name, keys<GraphicComponentLooseOption>(), name, "graphic");
+const GraphicComponent = (name: string) => Components<GraphicComponentLooseOption>(name, keys<AxisBaseOption>(), lower(name), "graphic");
 
-export const Graphic = GraphicComponent("graphic");
-export const Group = GraphicComponent("group");
-export const Image = GraphicComponent("image");
-export const Text = GraphicComponent("text");
-export const Rect = GraphicComponent("rect");
-export const Circle = GraphicComponent("circle");
-export const Ring = GraphicComponent("ring");
-export const Sector = GraphicComponent("sector");
-export const Arc = GraphicComponent("arc");
-export const Polygon = GraphicComponent("polygon");
-export const Polyline = GraphicComponent("polyline");
+export const Graphic = GraphicComponent("Graphic");
+export const Group = GraphicComponent("Group");
+export const Image = GraphicComponent("Image");
+export const Text = GraphicComponent("Text");
+export const Rect = GraphicComponent("Rect");
+export const Circle = GraphicComponent("Circle");
+export const Ring = GraphicComponent("Ring");
+export const Sector = GraphicComponent("Sector");
+export const Arc = GraphicComponent("Arc");
+export const Polygon = GraphicComponent("Polygon");
+export const Polyline = GraphicComponent("Polyline");
 // graphic.elements-line 不能和series.line重名
 export const GraphicLine = GraphicComponent("line");
 export const BezierCurve = GraphicComponent("bezierCurve");

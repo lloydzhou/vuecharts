@@ -2,6 +2,25 @@
   <div class="container">
     <Chart>
       <Grid :top="100" />
+      <Group
+        bottom="110"
+        right="110"
+        :rotation="Math.PI / 4"
+        bounding="raw"
+        :z="100"
+      >
+        <Rect
+          top="center"
+          left="center"
+          :shape='{ width: 400, height: 50 }'
+          :style='{ fill: "rgba(0,0,0,.3)" }'
+        />
+        <Text
+          top="center"
+          left="center"
+          :style='{text: "ECHARTS GRAPHIC TEXT", font: "bold 26px sans-serif", fill: "#FFFFFF"}'
+        />
+      </Group>
       <Legend :data="['data1', 'data2']" :top="65" />
       <Title text="顶部标题" subtext="顶部小标题" left="center" :top="10" />
       <Title text="底部标题" top="bottom" left="center" />
@@ -40,6 +59,7 @@ console.log('Echarts', Echarts)
 
 const { Chart, Title, Tooltip, Line, Bar, Legend, Grid, XAxis, YAxis, Heatmap, VisualMap } = Echarts
 const { Treemap, Sunburst } = Echarts
+const { Group, Text, Rect } = Echarts
 
 const TreemapSunburstTransition = defineComponent({
   name: 'TreemapSunburstTransition',
@@ -101,6 +121,7 @@ export default defineComponent({
     Title, Tooltip, Bar, Line, Legend, Grid, XAxis, YAxis,
     // Heatmap, VisualMap,
     TreemapSunburstTransition,
+    Group, Text, Rect,
   },
 
   setup() {
