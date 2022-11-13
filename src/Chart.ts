@@ -184,3 +184,5 @@ export const Chart: DefineComponent<typeof props, () => null> = defineComponent(
   }
 })
 
+export const useChartContext = () => inject(contextSymbol)
+

@@ -76,7 +76,7 @@ import {
   onUnmounted,
 } from 'vue'
 import { throttle } from "echarts/core";
-import { contextSymbol } from './Chart'
+import { contextSymbol, useChartContext } from './Chart'
 
 import { ValueAxisBaseOption, LogAxisBaseOption, CategoryAxisBaseOption, TimeAxisBaseOption, AxisBaseOptionCommon } from 'echarts/types/src/coord/axisCommonTypes'
 import { TransitionOptionMixin } from 'echarts/types/src/animation/customGraphicTransition'
@@ -156,7 +156,7 @@ export function Components<T>(name: string, props: string[], type: string = '', 
       // @ts-ignore
       const { id: pid, type: ptype, children, action, ...other } = props;
       // @ts-ignore
-      const { removeOption, setOption } = inject(contextSymbol)
+      const { removeOption, setOption } = useChartContext()
       // 这里使用一个初始化的id
       const id = ref((pid || uniqueId()) as string)
       // Graphic
