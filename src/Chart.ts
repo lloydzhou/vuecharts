@@ -20,20 +20,6 @@ import { addListener, removeListener } from "resize-detector";
 export const contextSymbol = String(Symbol('echartsContextSymbol'))
 
 
-const defaultTypeMap = {
-  Legend: 'plain',
-  XAxis: 'category',
-  YAxis: 'value',
-  RadiusAxis: 'value',
-  AngleAxis: 'category',
-  DataZoom: 'inside',
-  VisualMap: 'continuous',
-  AxisPointer: 'line',
-  ParallelAxis: 'value',
-  SingleAxis: 'value',
-  Timeline: 'slider',
-}
-
 const props = {
   option: {
     type: Object,
@@ -53,11 +39,11 @@ const props = {
   },
   width: {
     type: Number,
-    default : () => 0,
+    default : () => 600,
   },
   height: {
     type: Number,
-    default : () => 0,
+    default : () => 300,
   },
   autoresize: {
     type: Boolean,
