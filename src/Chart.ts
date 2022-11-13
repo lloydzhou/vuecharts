@@ -1,5 +1,6 @@
 // @ts-nocheck
 import {
+  DefineComponent,
   defineComponent,
   ref, markRaw, toRefs,
   shallowReactive,
@@ -33,43 +34,44 @@ const defaultTypeMap = {
   Timeline: 'slider',
 }
 
-export const Chart = defineComponent({
+const props = {
+  option: {
+    type: Object,
+    default : () => ({})
+  },
+  notMerge: {
+    type: Boolean,
+    default : () => false,
+  },
+  lazyUpdate: {
+    type: Boolean,
+    default : () => false,
+  },
+  group: {
+    type: String,
+    default : () => '',
+  },
+  width: {
+    type: Number,
+    default : () => 0,
+  },
+  height: {
+    type: Number,
+    default : () => 0,
+  },
+  autoresize: {
+    type: Boolean,
+    default : () => true,
+  },
+  theme: {
+    type: [Object, String],
+    default : () => undefined,
+  },
+}
+export const Chart: DefineComponent<typeof props, () => null> = defineComponent({
   name: 'Chart',
   inheritAttrs: false,
-  props: {
-    option: {
-      type: Object,
-      default : () => ({})
-    },
-    notMerge: {
-      type: Boolean,
-      default : () => false,
-    },
-    lazyUpdate: {
-      type: Boolean,
-      default : () => false,
-    },
-    group: {
-      type: String,
-      default : () => '',
-    },
-    width: {
-      type: Number,
-      default : () => 0,
-    },
-    height: {
-      type: Number,
-      default : () => 0,
-    },
-    autoresize: {
-      type: Boolean,
-      default : () => true,
-    },
-    theme: {
-      type: [Object, String],
-      default : () => undefined,
-    },
-  },
+  props,
   setup(props, { emit }) {
 
     const container = ref(null)

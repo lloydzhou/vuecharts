@@ -52,14 +52,12 @@
 import { defineComponent, inject, ref, onUnmounted, onMounted, h, reactive } from 'vue'
 // 这里是引用全部的echarts，可以自己参照文档做按需加载
 import 'echarts'
-import Echarts, { contextSymbol } from '../lib/index'
-// import Echarts from 'vuecharts3'
-
-console.log('Echarts', Echarts)
-
-const { Chart, Title, Tooltip, Line, Bar, Legend, Grid, XAxis, YAxis, Heatmap, VisualMap } = Echarts
-const { Treemap, Sunburst } = Echarts
-const { Group, Text, Rect } = Echarts
+import {
+  Chart, contextSymbol,
+  Title, Tooltip, Line, Bar, Legend, Grid, XAxis, YAxis, Heatmap, VisualMap,
+  Treemap, Sunburst,
+  Group, Text, Rect,
+} from '../lib/index'
 
 const TreemapSunburstTransition = defineComponent({
   name: 'TreemapSunburstTransition',

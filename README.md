@@ -13,10 +13,18 @@ yarn add vuecharts3
 
 ## Components
 
-项目定义的组件包含在下图中，每一个都是一个vue的Component。
-具体的组件支持的配置信息参考：https://echarts.apache.org/zh/option.html#title （可以通过名字首字母小写后搜索到对应的配置项目）
+1. 定义一个`Chart`组件作为画布
+2. 将[echarts官方配置项](https://echarts.apache.org/zh/option.html#title)每一个配置项使用统一的工厂函数构造成`React Component`
+3. 项目导出组件列表
 
-![image](https://user-images.githubusercontent.com/1826685/175003071-61970374-aceb-4579-ac63-cb042e267c77.png)
+||导出组件|
+|---|---|
+|series|`Line`, `Bar`, `Pie`, `Scatter`, `EffectScatter`, `Radar`, `Tree`, `Treemap`, `Sunburst`, `Boxplot`, `Candlestick`, `Heatmap`, `Map`, `Parallel`, `Lines`, `Graph`, `Sankey`, `Funnel`, `Gauge`, `PictorialBar`, `ThemeRiver`, `Custom`|
+|axis|`XAxis`, `YAxis`, `Polar`, `RadiusAxis`, `AngleAxis`, `RadarAxis`, `ParallelCoordinates`(`parallel`), `ParallelAxis`, `SingleAxis`, `Calendar`|
+|dataZoom|`DataZoom`, `Inside`, `Slider`|
+|visualMap|`VisualMap`, `Continuous`, `Piecewise`|
+|graphic|`Graphic`, `Group`, `Image`, `Text`, `Rect`, `Circle`, `Ring`, `Sector`, `Arc`, `Polygon`, `Polyline`, `GraphicLine`(`graphic.elements-line`), `BezierCurve`|
+|other|`Title`, `Legend`, `Grid`, `Tooltip`, `AxisPointer`, `Toolbox`, `Brush`, `Geo`, `Timeline`, `Dataset`, `Aria`|
 
 
 ## DEMO
