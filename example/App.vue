@@ -1,7 +1,26 @@
 <template>
   <div class="container">
-    <Chart>
+    <Chart ref="chart3">
       <Grid :top="100" />
+      <Group
+        bottom="110"
+        right="110"
+        :rotation="Math.PI / 4"
+        bounding="raw"
+        :z="100"
+      >
+        <Rect
+          top="center"
+          left="center"
+          :shape='{ width: 400, height: 50 }'
+          :style='{ fill: "rgba(0,0,0,.3)" }'
+        />
+        <Text
+          top="center"
+          left="center"
+          :style='{text: "ECHARTS GRAPHIC TEXT", font: "bold 26px sans-serif", fill: "#FFFFFF"}'
+        />
+      </Group>
       <Legend :data="['data1', 'data2']" :top="65" />
       <Title text="顶部标题" subtext="顶部小标题" left="center" :top="10" />
       <Title text="底部标题" top="bottom" left="center" />
@@ -22,7 +41,7 @@
       <e-heatmap name="Punch Card" :data="data" :label="{show: true}" :emphasis="{itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.5)'}}" />
     </e-chart>
     <h2>切换图形</h2>
-    <Chart ref="chart3">
+    <Chart>
       <TreemapSunburstTransition />
     </Chart>
   </div>
@@ -33,13 +52,12 @@
 import { defineComponent, inject, ref, onUnmounted, onMounted, h, reactive } from 'vue'
 // 这里是引用全部的echarts，可以自己参照文档做按需加载
 import 'echarts'
-import Echarts, { contextSymbol } from '../src/index'
-// import Echarts from 'vuecharts3'
-
-console.log('Echarts', Echarts)
-
-const { Chart, Title, Tooltip, Line, Bar, Legend, Grid, XAxis, YAxis, Heatmap, VisualMap } = Echarts
-const { Treemap, Sunburst } = Echarts
+import {
+  Chart, contextSymbol,
+  Title, Tooltip, Line, Bar, Legend, Grid, XAxis, YAxis, Heatmap, VisualMap,
+  Treemap, Sunburst,
+  Group, Text, Rect,
+} from '../lib/index'
 
 const TreemapSunburstTransition = defineComponent({
   name: 'TreemapSunburstTransition',
@@ -101,6 +119,7 @@ export default defineComponent({
     Title, Tooltip, Bar, Line, Legend, Grid, XAxis, YAxis,
     // Heatmap, VisualMap,
     TreemapSunburstTransition,
+    Group, Text, Rect,
   },
 
   setup() {

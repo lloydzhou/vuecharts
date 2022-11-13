@@ -1,11 +1,12 @@
 {
   "name": "vuecharts3",
-  "version": "2.2.5",
+  "version": "2.2.6-beta.0",
   "description": "the vue toolkit based on echarts",
   "scripts": {
     "prepare": "install-peers",
-    "serve": "ttsc --outDir src/option src/option.ts -w & vue-cli-service serve example/main.ts",
-    "build": "ttsc --outDir src/option src/option.ts && rollup -c",
+    "start": "ttsc -w & vue-cli-service serve example/main.ts",
+    "serve": "vue-cli-service serve example/main.ts",
+    "build": "ttsc -p tsconfig.porduction.json",
     "lint": "vue-cli-service lint"
   },
   "repository": {
@@ -17,13 +18,15 @@
     "vue3",
     "echarts"
   ],
-  "main": "dist/index.js",
-  "module": "dist/index.es.js",
+  "files": [
+    "lib"
+  ],
+  "main": "lib/index.js",
+  "module": "lib/index.js",
   "peerDependencies": {
     "echarts": "^5.3.3"
   },
   "devDependencies": {
-    "@rollup/plugin-typescript": "^8.3.3",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
     "@vue/babel-plugin-jsx": "^1.1.1",
@@ -46,17 +49,6 @@
     "less": "^4.1.2",
     "less-loader": "7.3.0",
     "lint-staged": "^9.5.0",
-    "rollup": "2.27.0",
-    "rollup-plugin-babel": "^4.4.0",
-    "rollup-plugin-buble": "^0.19.8",
-    "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-filesize": "^9.1.2",
-    "rollup-plugin-less": "^1.1.3",
-    "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-optimize-lodash-imports": "^1.0.2",
-    "rollup-plugin-typescript": "^1.0.1",
-    "rollup-plugin-typescript2": "^0.31.2",
-    "rollup-plugin-vue": "^6.0.0",
     "ts-transformer-keys": "^0.4.3",
     "ttypescript": "^1.5.13",
     "typescript": "~4.1.5",
@@ -84,6 +76,7 @@
     "rules": {
       "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/no-var-requires": "error",
+      "@typescript-eslint/no-inferrable-types": "off",
       "vue/no-setup-props-destructure": "off"
     }
   },

@@ -1,5 +1,6 @@
 // @ts-nocheck
 import {
+  DefineComponent,
   defineComponent,
   ref, markRaw, toRefs,
   shallowReactive,
@@ -15,15 +16,6 @@ import {
 // 按需加载  https://echarts.apache.org/handbook/zh/basics/import#%E6%8C%89%E9%9C%80%E5%BC%95%E5%85%A5-echarts-%E5%9B%BE%E8%A1%A8%E5%92%8C%E7%BB%84%E4%BB%B6
 import { init as initChart, throttle } from 'echarts/core'
 import { addListener, removeListener } from "resize-detector";
-import {
-  series,
-  visualMap,
-  dataZoom,
-  componentsMap,
-} from './option/option'
-
-
-export const uniqueId = () => Date.now().toString(36) + Math.random().toString(36).substring(2);
 
 export const contextSymbol = String(Symbol('echartsContextSymbol'))
 
@@ -42,43 +34,44 @@ const defaultTypeMap = {
   Timeline: 'slider',
 }
 
-export const Chart = defineComponent({
+const props = {
+  option: {
+    type: Object,
+    default : () => ({})
+  },
+  notMerge: {
+    type: Boolean,
+    default : () => false,
+  },
+  lazyUpdate: {
+    type: Boolean,
+    default : () => false,
+  },
+  group: {
+    type: String,
+    default : () => '',
+  },
+  width: {
+    type: Number,
+    default : () => 0,
+  },
+  height: {
+    type: Number,
+    default : () => 0,
+  },
+  autoresize: {
+    type: Boolean,
+    default : () => true,
+  },
+  theme: {
+    type: [Object, String],
+    default : () => undefined,
+  },
+}
+export const Chart: DefineComponent<typeof props, () => null> = defineComponent({
   name: 'Chart',
   inheritAttrs: false,
-  props: {
-    option: {
-      type: Object,
-      default : () => ({})
-    },
-    notMerge: {
-      type: Boolean,
-      default : () => false,
-    },
-    lazyUpdate: {
-      type: Boolean,
-      default : () => false,
-    },
-    group: {
-      type: String,
-      default : () => '',
-    },
-    width: {
-      type: Number,
-      default : () => 0,
-    },
-    height: {
-      type: Number,
-      default : () => 0,
-    },
-    autoresize: {
-      type: Boolean,
-      default : () => true,
-    },
-    theme: {
-      type: [Object, String],
-      default : () => undefined,
-    },
-  },
+  props,
   setup(props, { emit }) {
 
     const container = ref(null)
@@ -204,57 +197,4 @@ export const Chart = defineComponent({
     }), chart && slots.default && slots.default())
   }
 })
-
-const components = { Chart }
-/**
- * 这里是使用不同的配置生成了功能类似的组件
- * 1. 组件通过id记录自己的配置信息，并且通过id让Chart集中管理整体的配置信息。
- * 2. 监听props数据变化，更新当前组件配置
- * 3. 卸载的时候移除当前组件配置
- */
-Object.keys(componentsMap).forEach(name => {
-  // type为空，使用name首字母小写
-  const type = defaultTypeMap[name] || (name.charAt(0).toLowerCase() + name.slice(1))
-  components[name] = defineComponent({
-    name,
-    props: componentsMap[name],
-    inject: [contextSymbol],
-    setup (props) {
-      const key = series.indexOf(name) > -1
-        ? 'series'
-        : visualMap.indexOf(name) > -1
-          ? 'visualMap'
-          : dataZoom.indexOf() > -1
-            ? 'dataZoom'
-            : name.charAt(0).toLowerCase() + name.slice(1)
-      const { removeOption, setOption } = inject(contextSymbol)
-      // 这里使用一个初始化的id
-      const id = ref(props.id || uniqueId())
-      // 如果id有变化的时候，先移除旧的，再生成新的
-      watch(() => props.id, (newId) => {
-        removeOption(key, id)
-        id.value = newId
-        update()
-      })
-      const update = () => {
-        const options = markRaw({
-          ...props,
-          type: props.type || type || undefined,
-          id: id.value,
-        })
-        // console.log('chart', chart, key, options)
-        setOption(key, options)
-      }
-      // 监听props变化，更新配置信息
-      watch(() => props, update, { deep: true })
-      // 挂载组件的时候，初始化配置信息
-      onMounted(update)
-      onUnmounted(() => removeOption(key, id))
-
-      return () => null
-    }
-  })
-})
-
-export default components
 
