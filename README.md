@@ -1,4 +1,8 @@
 # vuecharts
+<a href="https://www.npmjs.com/package/vuecharts3"><img alt="NPM Package" src="https://img.shields.io/npm/v/vuecharts3.svg?style=flat-square"></a>
+<a href="https://www.npmjs.com/package/vuecharts3"><img alt="NPM Size" src="https://img.shields.io/bundlephobia/minzip/vuecharts3"></a>
+<a href="https://www.npmjs.com/package/vuecharts3"><img alt="NPM Downloads" src="https://img.shields.io/npm/dm/vuecharts3?logo=npm&style=flat-square"></a>
+<a href="/LICENSE"><img src="https://img.shields.io/github/license/lloydzhou/vuecharts3?style=flat-square" alt="MIT License"></a>
 
 ## 项目设计
 1. 官方团队[Baidu EFE team](https://github.com/ecomfe)有出一个vue封装的echarts库[vue-echarts](https://github.com/ecomfe/vue-echarts) 。但是这个库和自己在vue里面封装没有啥太大区别。仍旧摆脱不了针对一个图表写一个巨大的配置文件。
