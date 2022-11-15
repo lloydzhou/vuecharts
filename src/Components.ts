@@ -141,8 +141,7 @@ export interface ContainerProps {
 }
 
 
-// type EC<T> = DefineComponent<{[key: string]}, T & ContainerProps, () => null, {[key: string]: any}, {[key: string]: any}, {[key: string]: any}>;
-type EC<T> = DefineComponent<{[key: string]: any}, T & ContainerProps>;
+type EC<T> = DefineComponent<T & ContainerProps, {[key: string]: any}>;
 
 // https://github.com/vuejs/vue/blob/main/types/v3-define-component.d.ts#L71
 // ComponentOptionsWithoutProps
@@ -158,7 +157,7 @@ export function Components<T>(name: string, type: string = '', key: string = '')
     // @ts-ignore
     setup(props, { slots, attrs }) {
       // @ts-ignore
-      const { id: pid, type: ptype, children, action, ...other } = attrs;
+      const { id: pid, type: ptype, action, ...other } = attrs;
       // @ts-ignore
       const { removeOption, setOption } = useChartContext()
       // 这里使用一个初始化的id
@@ -166,13 +165,15 @@ export function Components<T>(name: string, type: string = '', key: string = '')
       // Graphic
       const state = shallowReactive({
         options: markRaw([]),
-        setOption: (key: string, option: any) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setOption: (key: string, option: {[key: string]: any}) => {
           state.removeOption(key, option.id)
           // @ts-ignore
           state.options.push({ ...option, z: option.z || other.z })
         },
         removeOption: (key: string, id: string) => {
           // @ts-ignore
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           state.options = state.options.filter((i: any) => i.id !== id.value)
         }
       })
