@@ -1,4 +1,3 @@
-import { keys } from 'ts-transformer-keys';
 import {
   //
   TitleOption,
@@ -74,6 +73,7 @@ import {
   inject,
   onMounted,
   onUnmounted,
+  ComponentOptionsWithoutProps,
 } from 'vue'
 import { throttle } from "echarts/core";
 import { contextSymbol, useChartContext } from './Chart'
@@ -141,20 +141,24 @@ export interface ContainerProps {
 }
 
 
-type EC<T> = DefineComponent<T & ContainerProps, () => null, {[key: string]: any}, {[key: string]: any}, {[key: string]: any}>;
+// type EC<T> = DefineComponent<{[key: string]}, T & ContainerProps, () => null, {[key: string]: any}, {[key: string]: any}, {[key: string]: any}>;
+type EC<T> = DefineComponent<{[key: string]: any}, T & ContainerProps>;
 
-export function Components<T>(name: string, props: string[], type: string = '', key: string = ''): EC<T> {
+// https://github.com/vuejs/vue/blob/main/types/v3-define-component.d.ts#L71
+// ComponentOptionsWithoutProps
+// 使用attrs替代props（可以不用再依赖ts-transformer-keys转换配置项key列表)
+export function Components<T>(name: string, type: string = '', key: string = ''): EC<T> {
   type = type || defaultType(name)
   key = key || getKeyByName(name)
-  return defineComponent<T & ContainerProps>({
+  return defineComponent({
     name,
-    // @ts-ignore
-    props: props as any,  // 使用ts-transformer-keys自动生成字段
+    // 移除：使用ts-transformer-keys自动生成字段
+    // props: props as any,
     inject: [contextSymbol],
     // @ts-ignore
-    setup(props, { slots }) {
+    setup(props, { slots, attrs }) {
       // @ts-ignore
-      const { id: pid, type: ptype, children, action, ...other } = props;
+      const { id: pid, type: ptype, children, action, ...other } = attrs;
       // @ts-ignore
       const { removeOption, setOption } = useChartContext()
       // 这里使用一个初始化的id
@@ -174,7 +178,7 @@ export function Components<T>(name: string, props: string[], type: string = '', 
       })
       provide(contextSymbol, state)
       // 如果id有变化的时候，先移除旧的，再生成新的
-      watch(() => props.id, (newId) => {
+      watch(() => attrs.id, (newId) => {
         removeOption(key, id)
         id.value = newId as string
         update()
@@ -195,8 +199,8 @@ export function Components<T>(name: string, props: string[], type: string = '', 
         }
         setOption(key, options)
       }, 40, true)
-      // 监听props变化，更新配置信息
-      watch(() => props, update, { deep: true })
+      // 监听attrs变化，更新配置信息
+      watch(() => attrs, update, { deep: true })
       // 挂载组件的时候，初始化配置信息
       onMounted(update)
       onUnmounted(() => removeOption(key, id))
@@ -206,79 +210,79 @@ export function Components<T>(name: string, props: string[], type: string = '', 
   }) as EC<T>
 }
 
-export const Title: EC<TitleOption> = Components<TitleOption>("Title", keys<TitleOption>());
-export const Legend: EC<LegendOption | ScrollableLegendOption> = Components<LegendOption | ScrollableLegendOption>("Legend", keys<LegendOption & ScrollableLegendOption>());
-export const Grid: EC<GridOption> = Components<GridOption>("Grid", keys<GridOption>());
-export const XAxis: EC<XAXisOption> = Components<XAXisOption>("XAxis", keys<XAXisOption & AxisBaseOption>());
-export const YAxis: EC<YAXisOption> = Components<YAXisOption>("YAxis", keys<YAXisOption & AxisBaseOption>());
-export const Polar: EC<PolarOption> = Components<PolarOption>("Polar", keys<PolarOption>());
-export const RadiusAxis: EC<RadiusAxisOption> = Components<RadiusAxisOption>("RadiusAxis", keys<RadiusAxisOption & AxisBaseOption>());
-export const AngleAxis: EC<AngleAxisOption> = Components<AngleAxisOption>("AngleAxis", keys<AngleAxisOption & AxisBaseOption>());
+export const Title: EC<TitleOption> = Components<TitleOption>("Title");
+export const Legend: EC<LegendOption | ScrollableLegendOption> = Components<LegendOption | ScrollableLegendOption>("Legend");
+export const Grid: EC<GridOption> = Components<GridOption>("Grid");
+export const XAxis: EC<XAXisOption> = Components<XAXisOption>("XAxis");
+export const YAxis: EC<YAXisOption> = Components<YAXisOption>("YAxis");
+export const Polar: EC<PolarOption> = Components<PolarOption>("Polar");
+export const RadiusAxis: EC<RadiusAxisOption> = Components<RadiusAxisOption>("RadiusAxis");
+export const AngleAxis: EC<AngleAxisOption> = Components<AngleAxisOption>("AngleAxis");
 // Radar和series.radar重合
-export const RadarAxis: EC<RadarOption> = Components<RadarOption>("RadarAxis", keys<RadarOption>());
+export const RadarAxis: EC<RadarOption> = Components<RadarOption>("RadarAxis");
 // // DataZoom
-export const DataZoom: EC<InsideDataZoomOption | SliderDataZoomOption> = Components<InsideDataZoomOption | SliderDataZoomOption>("DataZoom", keys<InsideDataZoomOption & SliderDataZoomOption>());
-export const Inside: EC<InsideDataZoomOption> = Components<InsideDataZoomOption>("Inside", keys<InsideDataZoomOption>());
-export const Slider: EC<SliderDataZoomOption> = Components<SliderDataZoomOption>("Slider", keys<SliderDataZoomOption>());
+export const DataZoom: EC<InsideDataZoomOption | SliderDataZoomOption> = Components<InsideDataZoomOption | SliderDataZoomOption>("DataZoom");
+export const Inside: EC<InsideDataZoomOption> = Components<InsideDataZoomOption>("Inside");
+export const Slider: EC<SliderDataZoomOption> = Components<SliderDataZoomOption>("Slider");
 // visualMap
-export const VisualMap: EC<ContinousVisualMapOption | PiecewiseVisualMapOption> = Components<ContinousVisualMapOption | PiecewiseVisualMapOption>("VisualMap", keys<ContinousVisualMapOption & PiecewiseVisualMapOption>());
-export const Continuous: EC<ContinousVisualMapOption> = Components<ContinousVisualMapOption>("Continuous", keys<ContinousVisualMapOption>());
-export const Piecewise: EC<PiecewiseVisualMapOption> = Components<PiecewiseVisualMapOption>("Piecewise", keys<PiecewiseVisualMapOption>());
+export const VisualMap: EC<ContinousVisualMapOption | PiecewiseVisualMapOption> = Components<ContinousVisualMapOption | PiecewiseVisualMapOption>("VisualMap");
+export const Continuous: EC<ContinousVisualMapOption> = Components<ContinousVisualMapOption>("Continuous");
+export const Piecewise: EC<PiecewiseVisualMapOption> = Components<PiecewiseVisualMapOption>("Piecewise");
 
-export const Tooltip: EC<TooltipOption> = Components<TooltipOption>("Tooltip", keys<TooltipOption>());
-export const AxisPointer: EC<AxisPointerOption> = Components<AxisPointerOption>("AxisPointer", keys<AxisPointerOption>());
-export const Toolbox: EC<ToolboxComponentOption> = Components<ToolboxComponentOption>("Toolbox", keys<ToolboxComponentOption>());
-export const Brush: EC<BrushOption> = Components<BrushOption>("Brush", keys<BrushOption>());
-export const Geo: EC<GeoOption> = Components<GeoOption>("Geo", keys<GeoOption>());
+export const Tooltip: EC<TooltipOption> = Components<TooltipOption>("Tooltip");
+export const AxisPointer: EC<AxisPointerOption> = Components<AxisPointerOption>("AxisPointer");
+export const Toolbox: EC<ToolboxComponentOption> = Components<ToolboxComponentOption>("Toolbox");
+export const Brush: EC<BrushOption> = Components<BrushOption>("Brush");
+export const Geo: EC<GeoOption> = Components<GeoOption>("Geo");
 // Parallel: [], // 这个和series.parallel重合了  ParallelCoordinates
-export const ParallelCoordinates: EC<ParallelCoordinateSystemOption> = Components<ParallelCoordinateSystemOption>("ParallelCoordinates", keys<ParallelCoordinateSystemOption>());
-export const ParallelAxis: EC<ParallelAxisOption> = Components<ParallelAxisOption>("ParallelAxis", keys<ParallelAxisOption & AxisBaseOption>());
-export const SingleAxis: EC<SingleAxisOption> = Components<SingleAxisOption>("SingleAxis", keys<SingleAxisOption & AxisBaseOption>());
-export const Timeline: EC<TimelineOption> = Components<TimelineOption>("Timeline", keys<TimelineOption>());
+export const ParallelCoordinates: EC<ParallelCoordinateSystemOption> = Components<ParallelCoordinateSystemOption>("ParallelCoordinates");
+export const ParallelAxis: EC<ParallelAxisOption> = Components<ParallelAxisOption>("ParallelAxis");
+export const SingleAxis: EC<SingleAxisOption> = Components<SingleAxisOption>("SingleAxis");
+export const Timeline: EC<TimelineOption> = Components<TimelineOption>("Timeline");
 
 // TODO Graphic: 这里可以尝试把Graphic里面的暴露出来
-export const Graphic: EC<GraphicComponentElementOption> = Components<GraphicComponentElementOption>("Graphic", keys<GraphicComponentElementOption>(), "graphic", "graphic");
-export const Group: EC<GraphicComponentGroupOption> = Components<GraphicComponentGroupOption>("Group", keys<GraphicComponentGroupOption & {z?: number}>(), "group", "graphic");
-export const Image: EC<GraphicComponentImageOption> = Components<GraphicComponentImageOption>("Image", keys<GraphicComponentImageOption>(), "image", "graphic");
-export const Text: EC<GraphicComponentTextOption> = Components<GraphicComponentTextOption>("Text", keys<GraphicComponentTextOption>(), "text", "graphic");
-export const Rect: EC<GraphicComponentZRPathOption> = Components<GraphicComponentZRPathOption>("Rect", keys<GraphicComponentZRPathOption>(), "rect", "graphic");
-export const Circle: EC<GraphicComponentZRPathOption> = Components<GraphicComponentZRPathOption>("Circle", keys<GraphicComponentZRPathOption>(), "circle", "graphic");
-export const Ring: EC<GraphicComponentZRPathOption> = Components<GraphicComponentZRPathOption>("Ring", keys<GraphicComponentZRPathOption>(), "ring", "graphic");
-export const Sector: EC<GraphicComponentZRPathOption> = Components<GraphicComponentZRPathOption>("Sector", keys<GraphicComponentZRPathOption>(), "sector", "graphic");
-export const Arc: EC<GraphicComponentZRPathOption> = Components<GraphicComponentZRPathOption>("arc", keys<GraphicComponentZRPathOption>(), "arc", "graphic");
-export const Polygon: EC<GraphicComponentZRPathOption> = Components<GraphicComponentZRPathOption>("Polygon", keys<GraphicComponentZRPathOption>(), "polygon", "graphic");
-export const Polyline: EC<GraphicComponentZRPathOption> = Components<GraphicComponentZRPathOption>("Polyline", keys<GraphicComponentZRPathOption>(), "polyline", "graphic");
+export const Graphic: EC<GraphicComponentElementOption> = Components<GraphicComponentElementOption>("Graphic", "graphic", "graphic");
+export const Group: EC<GraphicComponentGroupOption & {z?: number}> = Components<GraphicComponentGroupOption & {z?: number}>("Group", "group", "graphic");
+export const Image: EC<GraphicComponentImageOption> = Components<GraphicComponentImageOption>("Image", "image", "graphic");
+export const Text: EC<GraphicComponentTextOption> = Components<GraphicComponentTextOption>("Text", "text", "graphic");
+export const Rect: EC<GraphicComponentZRPathOption> = Components<GraphicComponentZRPathOption>("Rect", "rect", "graphic");
+export const Circle: EC<GraphicComponentZRPathOption> = Components<GraphicComponentZRPathOption>("Circle", "circle", "graphic");
+export const Ring: EC<GraphicComponentZRPathOption> = Components<GraphicComponentZRPathOption>("Ring", "ring", "graphic");
+export const Sector: EC<GraphicComponentZRPathOption> = Components<GraphicComponentZRPathOption>("Sector", "sector", "graphic");
+export const Arc: EC<GraphicComponentZRPathOption> = Components<GraphicComponentZRPathOption>("Arc", "arc", "graphic");
+export const Polygon: EC<GraphicComponentZRPathOption> = Components<GraphicComponentZRPathOption>("Polygon", "polygon", "graphic");
+export const Polyline: EC<GraphicComponentZRPathOption> = Components<GraphicComponentZRPathOption>("Polyline", "polyline", "graphic");
 // graphic.elements-line 不能和series.line重名
-export const GraphicLine: EC<GraphicComponentZRPathOption> = Components<GraphicComponentZRPathOption>("GraphicLine", keys<GraphicComponentZRPathOption>(), "line", "graphic");
-export const BezierCurve: EC<GraphicComponentZRPathOption> = Components<GraphicComponentZRPathOption>("BezierCurve", keys<GraphicComponentZRPathOption>(), "bezierCurve", "graphic");
+export const GraphicLine: EC<GraphicComponentZRPathOption> = Components<GraphicComponentZRPathOption>("GraphicLine", "line", "graphic");
+export const BezierCurve: EC<GraphicComponentZRPathOption> = Components<GraphicComponentZRPathOption>("BezierCurve", "bezierCurve", "graphic");
 
-export const Calendar: EC<CalendarOption> = Components<CalendarOption>("Calendar", keys<CalendarOption>());
-export const Dataset: EC<DatasetOption> = Components<DatasetOption>("Dataset", keys<DatasetOption>());
-export const Aria: EC<AriaOption> = Components<AriaOption>("Aria", keys<AriaOption>());
+export const Calendar: EC<CalendarOption> = Components<CalendarOption>("Calendar");
+export const Dataset: EC<DatasetOption> = Components<DatasetOption>("Dataset");
+export const Aria: EC<AriaOption> = Components<AriaOption>("Aria");
 
 // series
-export const Line: EC<LineSeriesOption> = Components<LineSeriesOption>("Line", keys<LineSeriesOption>());
-export const Bar: EC<BarSeriesOption> = Components<BarSeriesOption>("Bar", keys<BarSeriesOption>());
-export const Pie: EC<PieSeriesOption> = Components<PieSeriesOption>("Pie", keys<PieSeriesOption>());
-export const Scatter: EC<ScatterSeriesOption> = Components<ScatterSeriesOption>("Scatter", keys<ScatterSeriesOption>());
-export const EffectScatter: EC<EffectScatterSeriesOption> = Components<EffectScatterSeriesOption>("EffectScatter", keys<EffectScatterSeriesOption>());
-export const Radar: EC<RadarSeriesOption> = Components<RadarSeriesOption>("Radar", keys<RadarSeriesOption>());
-export const Tree: EC<TreeSeriesOption> = Components<TreeSeriesOption>("Tree", keys<TreeSeriesOption>());
-export const Treemap: EC<TreemapSeriesOption> = Components<TreemapSeriesOption>("Treemap", keys<TreemapSeriesOption>());
-export const Sunburst: EC<SunburstSeriesOption> = Components<SunburstSeriesOption>("Sunburst", keys<SunburstSeriesOption>());
-export const Boxplot: EC<BoxplotSeriesOption> = Components<BoxplotSeriesOption>("Boxplot", keys<BoxplotSeriesOption>());
-export const Candlestick: EC<CandlestickSeriesOption> = Components<CandlestickSeriesOption>("Candlestick", keys<CandlestickSeriesOption>());
-export const Heatmap: EC<HeatmapSeriesOption> = Components<HeatmapSeriesOption>("Heatmap", keys<HeatmapSeriesOption>());
-export const Map: EC<MapSeriesOption> = Components<MapSeriesOption>("Map", keys<MapSeriesOption>());
-export const Parallel: EC<ParallelSeriesOption> = Components<ParallelSeriesOption>("Partial", keys<ParallelSeriesOption>());
-export const Lines: EC<LinesSeriesOption> = Components<LinesSeriesOption>("Lines", keys<LinesSeriesOption>());
-export const Graph: EC<GraphSeriesOption> = Components<GraphSeriesOption>("Graph", keys<GraphSeriesOption>());
-export const Sankey: EC<SankeySeriesOption> = Components<SankeySeriesOption>("Sankey", keys<SankeySeriesOption>());
-export const Funnel: EC<FunnelSeriesOption> = Components<FunnelSeriesOption>("Funnel", keys<FunnelSeriesOption>());
-export const Gauge: EC<GaugeSeriesOption> = Components<GaugeSeriesOption>("Gauge", keys<GaugeSeriesOption>());
-export const PictorialBar: EC<PictorialBarSeriesOption> = Components<PictorialBarSeriesOption>("PictorialBar", keys<PictorialBarSeriesOption>());
-export const ThemeRiver: EC<ThemeRiverSeriesOption> = Components<ThemeRiverSeriesOption>("ThemeRiver", keys<ThemeRiverSeriesOption>());
-export const Custom: EC<CustomSeriesOption> = Components<CustomSeriesOption>("Custom", keys<CustomSeriesOption>());
+export const Line: EC<LineSeriesOption> = Components<LineSeriesOption>("Line");
+export const Bar: EC<BarSeriesOption> = Components<BarSeriesOption>("Bar");
+export const Pie: EC<PieSeriesOption> = Components<PieSeriesOption>("Pie");
+export const Scatter: EC<ScatterSeriesOption> = Components<ScatterSeriesOption>("Scatter");
+export const EffectScatter: EC<EffectScatterSeriesOption> = Components<EffectScatterSeriesOption>("EffectScatter");
+export const Radar: EC<RadarSeriesOption> = Components<RadarSeriesOption>("Radar");
+export const Tree: EC<TreeSeriesOption> = Components<TreeSeriesOption>("Tree");
+export const Treemap: EC<TreemapSeriesOption> = Components<TreemapSeriesOption>("Treemap");
+export const Sunburst: EC<SunburstSeriesOption> = Components<SunburstSeriesOption>("Sunburst");
+export const Boxplot: EC<BoxplotSeriesOption> = Components<BoxplotSeriesOption>("Boxplot");
+export const Candlestick: EC<CandlestickSeriesOption> = Components<CandlestickSeriesOption>("Candlestick");
+export const Heatmap: EC<HeatmapSeriesOption> = Components<HeatmapSeriesOption>("Heatmap");
+export const Map: EC<MapSeriesOption> = Components<MapSeriesOption>("Map");
+export const Parallel: EC<ParallelSeriesOption> = Components<ParallelSeriesOption>("Partial");
+export const Lines: EC<LinesSeriesOption> = Components<LinesSeriesOption>("Lines");
+export const Graph: EC<GraphSeriesOption> = Components<GraphSeriesOption>("Graph");
+export const Sankey: EC<SankeySeriesOption> = Components<SankeySeriesOption>("Sankey");
+export const Funnel: EC<FunnelSeriesOption> = Components<FunnelSeriesOption>("Funnel");
+export const Gauge: EC<GaugeSeriesOption> = Components<GaugeSeriesOption>("Gauge");
+export const PictorialBar: EC<PictorialBarSeriesOption> = Components<PictorialBarSeriesOption>("PictorialBar");
+export const ThemeRiver: EC<ThemeRiverSeriesOption> = Components<ThemeRiverSeriesOption>("ThemeRiver");
+export const Custom: EC<CustomSeriesOption> = Components<CustomSeriesOption>("Custom");
 
 export * from './Chart'
 
