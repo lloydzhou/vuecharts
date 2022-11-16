@@ -81,7 +81,7 @@ export default defineComponent({
 
 ```
 
-![image](https://user-images.githubusercontent.com/1826685/174950158-e5f8258d-b0b9-4c39-be90-7eefbb7667f0.png)
+![image](https://user-images.githubusercontent.com/1826685/202209638-88b179f2-1207-4e45-aa74-fc9e1b8d2e45.png)
 
 
 ## custom component
