@@ -10,7 +10,7 @@
 ## 项目设计
 1. 官方团队[Baidu EFE team](https://github.com/ecomfe)有出一个vue封装的echarts库[vue-echarts](https://github.com/ecomfe/vue-echarts) 。但是这个库和自己在vue里面封装没有啥太大区别。仍旧摆脱不了针对一个图表写一个巨大的配置文件。
 2. 参考[BizCharts](https://github.com/alibaba/BizCharts)对[G2](https://github.com/antvis/G2)这个库的封装方式，对echarts进行了封装。相对而言API更方便使用
-3. 使用[ts-transformer-keys](https://github.com/kimamula/ts-transformer-keys)，从echarts导出的XXOption自动生成vue组件props
+3. ~~使用[ts-transformer-keys](https://github.com/kimamula/ts-transformer-keys)，从echarts导出的XXOption自动生成vue组件props~~
 
 
 ## 安装
