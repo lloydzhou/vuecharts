@@ -13,7 +13,7 @@
 3. typescript support
 
 
-## 安装
+## install
 ```
 yarn add vuecharts3
 ```
