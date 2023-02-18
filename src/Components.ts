@@ -59,7 +59,7 @@ import {
   GraphicComponentGroupOption,
   GraphicComponentZRPathOption,
   GraphicComponentImageOption,
-  // GraphicComponentTextOption,
+  GraphicComponentTextOption,
   GraphicComponentDisplayableOption
 } from 'echarts/types/src/component/graphic/GraphicModel'
 import { ParallelAxisOption } from 'echarts/types/src/coord/parallel/AxisModel'
@@ -81,17 +81,6 @@ import { contextSymbol, useChartContext } from './Chart'
 import { ValueAxisBaseOption, LogAxisBaseOption, CategoryAxisBaseOption, TimeAxisBaseOption, AxisBaseOptionCommon } from 'echarts/types/src/coord/axisCommonTypes'
 import { TransitionOptionMixin } from 'echarts/types/src/animation/customGraphicTransition'
 import { ElementKeyframeAnimationOption } from 'echarts/types/src/animation/customGraphicKeyframeAnimation';
-
-import { TextStyleProps, TextProps } from 'zrender/lib/graphic/Text'
-
-// merge type
-type AxisBaseOption = ValueAxisBaseOption & LogAxisBaseOption & CategoryAxisBaseOption & TimeAxisBaseOption & AxisBaseOptionCommon
-// copy from echarts/types/src/component/graphic/GraphicModel
-interface GraphicComponentTextOption extends Omit<GraphicComponentDisplayableOption, 'textContent' | 'textConfig'>, TransitionOptionMixin<TextProps> {
-  type?: 'text';
-  style?: TextStyleProps & TransitionOptionMixin<TextStyleProps>;
-  keyframeAnimation?: ElementKeyframeAnimationOption<TextProps> | ElementKeyframeAnimationOption<TextProps>[];
-}
 
 export const series = [
   'Line', 'Bar', 'Pie', 'Scatter', 'EffectScatter', 'Radar', 'Tree', 'Treemap',

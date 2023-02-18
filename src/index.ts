@@ -15,8 +15,6 @@ if (typeof window !== 'undefined' && window.Vue) {
   install(window.Vue);
 }
 
-Echarts.install = install
-
 export default Echarts
 export * from './Components'
 
