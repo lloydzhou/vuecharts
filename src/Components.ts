@@ -130,7 +130,7 @@ export interface ContainerProps {
 }
 
 
-type EC<T> = DefineComponent<T & ContainerProps, {[key: string]: any}>;
+export type EC<T> = DefineComponent<T & ContainerProps, {[key: string]: any}>;
 
 // https://github.com/vuejs/vue/blob/main/types/v3-define-component.d.ts#L71
 // ComponentOptionsWithoutProps

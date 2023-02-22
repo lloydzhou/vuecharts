@@ -44,6 +44,25 @@
     <Chart>
       <TreemapSunburstTransition />
     </Chart>
+    <h2>surface-wave</h2>
+    <Chart :width="800" :height="600">
+      <VisualMap
+        :inRange='{color: ["#313695","#4575b4","#74add1","#abd9e9","#e0f3f8","#ffffbf","#fee090","#fdae61","#f46d43","#d73027","#a50026",]}'
+        :show="false"
+        :dimension="2"
+        :min="-1"
+        :max="1"
+      />
+      <XAxis3D />
+      <YAxis3D />
+      <ZAxis3D :max="1" :splitNumber="2" />
+      <Grid3D :boxHeight="40" />
+      <Surface
+        :wireframe='{ show: false }'
+        shading="color"
+        :equation='equation'
+      />
+    </Chart>
   </div>
 </template>
 
@@ -52,12 +71,15 @@
 import { defineComponent, inject, ref, onUnmounted, onMounted, h, reactive } from 'vue'
 // 这里是引用全部的echarts，可以自己参照文档做按需加载
 import 'echarts'
+import 'echarts-gl'
 import {
   Chart, contextSymbol,
   Title, Tooltip, Line, Bar, Legend, Grid, XAxis, YAxis, Heatmap, VisualMap,
   Treemap, Sunburst,
   Group, Text, Rect,
 } from '../lib/index'
+
+import { XAxis3D, YAxis3D, ZAxis3D, Grid3D, Surface } from "../lib/index";
 
 const TreemapSunburstTransition = defineComponent({
   name: 'TreemapSunburstTransition',
@@ -120,6 +142,7 @@ export default defineComponent({
     // Heatmap, VisualMap,
     TreemapSunburstTransition,
     Group, Text, Rect,
+    VisualMap, XAxis3D, YAxis3D, ZAxis3D, Grid3D, Surface,
   },
 
   setup() {
@@ -144,11 +167,28 @@ export default defineComponent({
       console.log('chart3', chart3.value)
     })
 
+    const equation = {
+      x: {
+        step: 0.05,
+        min: -3,
+        max: 3,
+      },
+      y: {
+        step: 0.05,
+        min: -3,
+        max: 3,
+      },
+      z: function (x: number, y: number) {
+        return (Math.sin(x * x + y * y) * x) / 3.14;
+      },
+    };
+
     return {
       hours,
       days,
       data,
       chart3,
+      equation,
     }
   }
 })

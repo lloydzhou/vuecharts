@@ -17,4 +17,5 @@ if (typeof window !== 'undefined' && window.Vue) {
 
 export default Echarts
 export * from './Components'
+export * from './GL'
 
