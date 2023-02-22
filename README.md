@@ -22,7 +22,7 @@ yarn add vuecharts3
 
 1. 定义一个`Chart`组件作为画布
 2. 将[echarts官方配置项](https://echarts.apache.org/zh/option.html#title)每一个配置项使用统一的工厂函数构造成`Vue Component`
-3. 项目导出组件列表
+3. 项目导出组件列表（新增支持echarts-gl）
 
 ||导出组件|
 |---|---|
@@ -32,6 +32,7 @@ yarn add vuecharts3
 |visualMap|`VisualMap`, `Continuous`, `Piecewise`|
 |graphic|`Graphic`, `Group`, `Image`, `Text`, `Rect`, `Circle`, `Ring`, `Sector`, `Arc`, `Polygon`, `Polyline`, `GraphicLine`(`graphic.elements-line`), `BezierCurve`|
 |other|`Title`, `Legend`, `Grid`, `Tooltip`, `AxisPointer`, `Toolbox`, `Brush`, `Geo`, `Timeline`, `Dataset`, `Aria`|
+|gl|`Globe`, `Geo3d`, `Mapbox3d`, `Grid3D`, `XAxis3D`, `YAxis3D`, `ZAxis3D`, `Scatter3D`, `Bar3D`, `Line3D`, `Lines3D`, `Map3D`, `Surface`, `Polygons3D`, `ScatterGL`, `GraphGL`, `FlowGL`|
 
 
 ## DEMO
